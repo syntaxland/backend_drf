@@ -39,7 +39,6 @@ ALLOWED_HOSTS = [
     # "http://127.0.0.1:8000",
 ]
 
-
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -156,17 +155,6 @@ DATABASES = {
 #         'HOST': os.getenv('DB_HOST'),
 #         'PORT': int(os.getenv('DB_PORT')),
 #      }
-# }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'mcdofglobal',
-#         'USER': 'root',
-#         'PASSWORD': 'besko1988@JB',
-#         'HOST': 'localhost',
-#         'PORT': '3306',
-#     }
 # }
 
 # DATABASES = {
