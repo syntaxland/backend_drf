@@ -26,7 +26,6 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-
 class Review(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
@@ -58,7 +57,6 @@ class Order(models.Model):
 
     def __str__(self):
         return str(self.createdAt)
-
 
 class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
