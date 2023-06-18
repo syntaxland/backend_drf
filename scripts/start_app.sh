@@ -1,6 +1,6 @@
 #!/usr/bin/bash 
 
-sed -i 's/\[]/\["54.144.250.113"]/' /home/ubuntu/backend_drf/backend_drf/settings.py
+sed -i 's/\[]/\["54.159.74.226"]/' /home/ubuntu/backend_drf/backend_drf/settings.py
 
 python manage.py migrate 
 python manage.py makemigrations     
