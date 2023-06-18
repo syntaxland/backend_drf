@@ -11,6 +11,8 @@ from rest_framework import status
 from django.contrib.auth.hashers import make_password
 from .serializer import ProductSerializer, UserSerializer, UserSerializerWithToken
 
+def index(request):
+    return render(request,'index.html')
 
 # Local data response from product.py
 # from .products import products
@@ -27,10 +29,9 @@ from .serializer import ProductSerializer, UserSerializer, UserSerializerWithTok
 #             break
 #     return Response(product)
 
-
 @api_view(['GET'])
 def getRoutes(request):
-    return Response('Welcome!')
+    return Response('Welcome user!')
 
 
 @api_view(['GET'])
