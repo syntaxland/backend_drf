@@ -32,15 +32,15 @@ SECRET_KEY = 'django-insecure-_#gopr9mlt-y5v4bi*7shrfhau)&5kyznb9!yjh)9m+t16-0q+
 DEBUG = True
 # DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', 
-                 'localhost:8000', 
-                 '127.0.0.1', 
-                 '127.0.0.1:8000', 
-                 '54.84.220.209', 
-                 'ec2-54-84-220-209.compute-1.amazonaws.com', 
-                 'mcdofglobal.s3-website-us-east-1.amazonaws.com'
-                 ]
-# ALLOWED_HOSTS = ["*"]
+# ALLOWED_HOSTS = ['localhost', 
+#                  'localhost:8000', 
+#                  '127.0.0.1', 
+#                  '127.0.0.1:8000', 
+#                  '54.84.220.209', 
+#                  'ec2-54-84-220-209.compute-1.amazonaws.com', 
+#                  'mcdofglobal.s3-website-us-east-1.amazonaws.com'
+#                  ]
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 INSTALLED_APPS = [
@@ -107,7 +107,7 @@ SIMPLE_JWT = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    "corsheaders.middleware.CorsMiddleware",  # Adding third-part middleware
+    "corsheaders.middleware.CorsMiddleware",  # Adding third-part corsheaders middleware
     'django.middleware.common.CommonMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # whitenoise middleware added
     'django.middleware.csrf.CsrfViewMiddleware',
