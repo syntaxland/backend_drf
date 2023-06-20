@@ -23,11 +23,40 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 import os
 from dotenv import load_dotenv
 load_dotenv()
+# Getting AWS env var
+import json
+import boto3
+import base64
+from botocore.exceptions import ClientError
+
+def lambda_handler(event, context):
+    environment  = event['SECRET_KEY']
+    secret_name = 'mcdof/store/secret/keys'
+    region_name = "us-east-1"
+    # Create a Secrets Manager client
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
+    try:
+        secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+    except ClientError as e:
+        raise e
+    else:
+        if 'SecretString' in secret_value_response:
+            secret = json.loads(secret_value_response['SecretString'])
+            return secret
+        else:
+            decode_binary_secret = base64.base64decode(secret_value_response['SecretBinary'])
+            return decode_binary_secret
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = os.getenv('SECRET_KEY')
-SECRET_KEY = 'django-insecure-_#gopr9mlt-y5v4bi*7shrfhau)&5kyznb9!yjh)9m+t16-0q+'
-
+# SECRET_KEY = 'django-insecure-_#gopr9mlt-y5v4bi*7shrfhau)&5kyznb9!yjh)9m+t16-0q+'
+SECRET_KEY = "SECRET_KEY"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 # DEBUG = False
