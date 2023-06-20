@@ -23,6 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 import os
 from dotenv import load_dotenv
 load_dotenv()
+#--------------------------------------------------------------------------------------------------
 # Getting AWS env var
 import json
 import boto3
@@ -52,6 +53,7 @@ def lambda_handler(event, context):
         else:
             decode_binary_secret = base64.base64decode(secret_value_response['SecretBinary'])
             return decode_binary_secret
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = os.getenv('SECRET_KEY')
@@ -88,6 +90,7 @@ INSTALLED_APPS = [
     # Third-party apps
     'rest_framework',
     'corsheaders',
+    'storages',
 ]
 
 # Adding JWT Auth
@@ -288,3 +291,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ]
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+# setting up s3 storages for media and static  
+from storages.backends.s3boto3 import S3Boto3Storage
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+AWS_ACCESS_KEY_ID = 'your-access-key-id'
+AWS_SECRET_ACCESS_KEY = 'your-secret-access-key'
+AWS_STORAGE_BUCKET_NAME = 'your-bucket-name'
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
