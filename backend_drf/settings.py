@@ -22,16 +22,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 import os
 from dotenv import load_dotenv
 load_dotenv()
+
 #--------------------------------------------------------------------------------------------------
-# Getting AWS env var
+""" 
+# AWS Secrets Manager for S3 Media Storages, Secret Keys, DB Env...
 import json
 import boto3
 import base64
 from botocore.exceptions import ClientError
 
 def lambda_handler(event, context):
-    environment  = event['SECRET_KEY']
-    secret_name = 'mcdof/store/secret/keys'
+    environment  = event['env']
+    secret_name = 'mcdof/store/%s/keys' % environment
     region_name = "us-east-1"
     # Create a Secrets Manager client
     session = boto3.session.Session()
@@ -52,12 +54,52 @@ def lambda_handler(event, context):
         else:
             decode_binary_secret = base64.base64decode(secret_value_response['SecretBinary'])
             return decode_binary_secret
+"""
+# OR
+"""
+import os
+import json
+import boto3
+from django.core.exceptions import ImproperlyConfigured
 
+# Helper function to get environment variables or raise an error
+def get_env_variable(var_name):
+    try:
+        return os.environ[var_name]
+    except KeyError:
+        error_msg = f"Environment variable '{var_name}' not set"
+        raise ImproperlyConfigured(error_msg)
+
+# Load Secrets Manager secrets
+def load_secrets():
+    secret_name = "your-secret-name"  
+    region_name = "your-aws-region"  
+
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
+    response = client.get_secret_value(SecretId=secret_name)
+
+    if 'SecretString' in response:
+        secret = response['SecretString']
+    else:
+        secret = json.loads(response['SecretBinary'])
+
+    return json.loads(secret)
+
+# Load secrets from AWS Secrets Manager
+secrets = load_secrets()
+
+# Django Secret Key
+SECRET_KEY = get_env_variable('SECRET_KEY') or secrets.get('SECRET_KEY')
+"""
+#--------------------------------------------------------------------------------------------------
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
 # SECRET_KEY = 'django-insecure-_#gopr9mlt-y5v4bi*7shrfhau)&5kyznb9!yjh)9m+t16-0q+'
-# SECRET_KEY = "SECRET_KEY"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 # DEBUG = False
@@ -218,8 +260,8 @@ DATABASES = {
 #     },
 # }
 
-# # AWS RDS (Remote)
-
+# AWS RDS (prod)
+# Using .env
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -229,6 +271,34 @@ DATABASES = {
 #         'HOST': os.getenv('DB_HOST'),
 #         'PORT': int(os.getenv('DB_PORT')),
 #     }
+# }
+
+# For AWS Secret Manager
+# DATABASES = {
+#        'default': {
+#            'ENGINE': 'django.db.backends.postgresql',
+#            'NAME': secrets.get('DB_NAME'),
+#            'USER': secrets.get('DB_USER'),
+#            'PASSWORD': secrets.get('DB_PASSWORD'),
+#            'HOST': secrets.get('DB_HOST'),
+#            'PORT': secrets.get('DB_PORT', '5432'),
+#        }
+# }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'djongo',
+#         'NAME': os.getenv('MONGODB_NAME'),
+#         'ENFORCE_SCHEMA': False,
+#         'CLIENT': {
+#             'host': secrets.get('MONGODB_HOST'),
+#             'port': int(secrets.get('MONGODB_PORT')),
+#             'username': secrets.get('MONGODB_USER'),
+#             'password': secrets.get('MONGODB_PASS'),
+#             'authSource': 'admin',
+#             # 'authMechanism': 'SCRAM-SHA-1',
+#         },
+#     },
 # }
 
 # Password validation
@@ -296,13 +366,26 @@ CORS_ALLOW_ALL_ORIGINS = True
 # DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # AWS ACCESS ID KEY-SECRET 
-AWS_ACCESS_KEY_ID = 'AWS_ACCESS_KEY_ID'
-AWS_SECRET_ACCESS_KEY = 'AWS_SECRET_ACCESS_KEY'
-# AWS S3 BUCKET CONFIG
-AWS_STORAGE_BUCKET_NAME = 'mcdofglobal'
+# AWS_ACCESS_KEY_ID = 'AWS_ACCESS_KEY_ID'
+# AWS_SECRET_ACCESS_KEY = 'AWS_SECRET_ACCESS_KEY'
+
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
 AWS_S3_SIGNATURE_NAME = 's3v4',
 AWS_S3_REGION_NAME = 'us-east-1'
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL =  None
 AWS_S3_VERITY = True
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+"""
+# For AWS Secret Manager
+# AWS S3 Media Storage
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_ACCESS_KEY_ID = secrets.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = secrets.get('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = 'your-bucket-name'  # Replace with your S3 bucket name
+AWS_S3_REGION_NAME = 'your-aws-region'  # Replace with your AWS region
+AWS_QUERYSTRING_AUTH = False  # Optional: Remove query parameters from S3 URLs
+"""
