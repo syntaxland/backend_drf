@@ -108,7 +108,7 @@ DEBUG = True
 #                  '127.0.0.1', 
 #                  '127.0.0.1:8000', 
 #                  '54.34.229.79.247', 
-#                  'ec2-34-229-79-247.compute-1.amazonaws.com', 
+#                  'ec2-18-212-11-87.compute-1.amazonaws.com', 
 #                  'mcdofglobal.s3-website-us-east-1.amazonaws.com'
 #                  ]
 ALLOWED_HOSTS = ["*"]
