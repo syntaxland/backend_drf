@@ -10,18 +10,17 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import os
 from pathlib import Path
-
+from datetime import timedelta
+# Adding dotenv 
+from dotenv import load_dotenv
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
-
-# Adding dotenv 
-import os
-from dotenv import load_dotenv
-load_dotenv()
 
 #--------------------------------------------------------------------------------------------------
 """ 
@@ -108,13 +107,13 @@ DEBUG = True
 #                  'localhost:8000', 
 #                  '127.0.0.1', 
 #                  '127.0.0.1:8000', 
-#                  '54.84.220.209', 
-#                  'ec2-54-84-220-209.compute-1.amazonaws.com', 
+#                  '54.34.229.79.247', 
+#                  'ec2-34-229-79-247.compute-1.amazonaws.com', 
 #                  'mcdofglobal.s3-website-us-east-1.amazonaws.com'
 #                  ]
 ALLOWED_HOSTS = ["*"]
 
-# Application definition
+# Application definition 
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -124,32 +123,45 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Myapps
-    'app.apps.AppConfig',
-    'djmoney',
-
+    # Myapps 
+    'app.apps.AppConfig', 
+    'payment',
+    'user_profile', 
+    'send_email_otp',
+    'send_reset_password_email',
+  
     # Third-party apps
     'rest_framework',
+    'rest_framework_simplejwt',
+    # 'rest_framework_simplejwt.token_blacklist',
+
+    # Google Login Config
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+
     'corsheaders',
     'storages',
 ]
 
 # Adding JWT Auth
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_PERMISSION_CLASSES': [
+        # 'rest_framework.permissions.IsAuthenticated',
+        # 'rest_framework.permissions.AllowAny',  
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+        # 'rest_framework.authentication.TokenAuthentication',
+    ]
 }
- 
-# Django project settings.py
-
-from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=600),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
-    'BLACKLIST_AFTER_ROTATION': False,
+    'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
 
     'ALGORITHM': 'HS256',
@@ -173,10 +185,12 @@ SIMPLE_JWT = {
     'JTI_CLAIM': 'jti',
 
     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
-    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
-    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=180),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=7),
+    # "TOKEN_OBTAIN_SERIALIZER": "app.serializers.MyTokenObtainPairSerializer",
+    # "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
 }
-
+  
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -343,7 +357,7 @@ STATICFILES_DIRS = [
 
 MEDIA_URL = '/media/'
 # MEDIA_ROOT = BASE_DIR / 'media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/') 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -365,10 +379,6 @@ CORS_ALLOW_ALL_ORIGINS = True
 # from storages.backends.s3boto3 import S3Boto3Storage
 # DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-# AWS ACCESS ID KEY-SECRET 
-# AWS_ACCESS_KEY_ID = 'AWS_ACCESS_KEY_ID'
-# AWS_SECRET_ACCESS_KEY = 'AWS_SECRET_ACCESS_KEY'
-
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
@@ -379,13 +389,64 @@ AWS_DEFAULT_ACL =  None
 AWS_S3_VERITY = True
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-"""
-# For AWS Secret Manager
-# AWS S3 Media Storage
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-AWS_ACCESS_KEY_ID = secrets.get('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = secrets.get('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = 'your-bucket-name'  # Replace with your S3 bucket name
-AWS_S3_REGION_NAME = 'your-aws-region'  # Replace with your AWS region
-AWS_QUERYSTRING_AUTH = False  # Optional: Remove query parameters from S3 URLs
-"""
+# for sms otp
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
+TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER')
+
+MY_PHONE_NUMBER  = os.getenv('MY_PHONE_NUMBER')
+
+# for captcha
+RECAPTCHA_PUBLIC_KEY = os.getenv('RECAPTCHA_PUBLIC_KEY')
+RECAPTCHA_PRIVATE_KEY = os.getenv('RECAPTCHA_PRIVATE_KEY')
+RECAPTCHA_REQUIRED_SCORE = os.getenv('RECAPTCHA_REQUIRED_SCORE')
+
+# for email otp
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp-relay.sendinblue.com'
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_SENDER_NAME = os.getenv('EMAIL_SENDER_NAME')
+
+# for email otp api key
+SENDINBLUE_API_KEY = os.getenv('SENDINBLUE_API_KEY')
+# AWS SNS ARN
+AWS_SNS_EMAIL_TOPIC_ARN = os.getenv('SENDINBLUE_API_KEY')
+AWS_SNS_REGION = 'us-east-1'
+AWS_REGION = 'us-east-1'
+
+
+PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY')
+PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')
+PAYSTACK_PAYMENT_URL = os.getenv('PAYSTACK_PAYMENT_URL')
+CALLBACK_URL = os.getenv('CALLBACK_URL')
+
+# for google login option
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend', 
+    'allauth.account.auth_backends.AuthenticationBackend',
+]  
+ 
+SITE_ID = 1
+
+# Google OAuth2 settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': 'YOUR_GOOGLE_CLIENT_ID',
+            'secret': 'YOUR_GOOGLE_CLIENT_SECRET',
+            'key': ''
+        }
+    }
+}
+
+# Redirect URL after Google login
+LOGIN_REDIRECT_URL = '/'  # Replace with your desired URL
+# Logout URL
+LOGOUT_REDIRECT_URL = '/login'
+
+
+AUTH_USER_MODEL = 'user_profile.User' 
+
