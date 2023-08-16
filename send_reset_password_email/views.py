@@ -45,7 +45,8 @@ def send_password_reset_link_view(request):
             first_name = user.first_name 
             # first_name = data['first_name'].title() if data.get('first_name') else 'User'
             # password_reset_url = request.build_absolute_uri(reverse('password_reset', kwargs={'token': token.token}))
-            password_reset_url = "http://localhost:3000/reset-password/" + token.token
+            # password_reset_url = "http://localhost:3000/reset-password/" + token.token
+            password_reset_url = " http://mcdofglobal.s3-website-us-east-1.amazonaws.com/reset-password/" + token.token
             html_content = f"""
             <!DOCTYPE html>
             <html>
