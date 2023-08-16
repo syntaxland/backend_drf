@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'password', 'phone_number', 'is_verified']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'password', 'phone_number', 'is_verified', 'is_superuser', 'created_at']
         extra_kwargs = {
             'password': {'write_only': True},
         }
@@ -43,3 +43,23 @@ class UserSerializerWithToken(UserSerializer):
         token = RefreshToken.for_user(obj)
         return str(token.access_token)
     
+
+class UpdateUserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'phone_number', 'avatar']
+
+
+class AvatarUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User  
+        fields = ('avatar',)
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+
+class DeleteAccountSerializer(serializers.Serializer):
+    password = serializers.CharField(required=True)

@@ -20,7 +20,7 @@ urlpatterns = [
     path('api/', include('app.urls')),
     path('api/', include('user_profile.urls')),
     path('api/', include('send_email_otp.urls')), 
-    # path('api/', include('send_email_otp.urls')),
+    path('api/', include('send_reset_password_email.urls')), 
     path('api/', include('payment.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

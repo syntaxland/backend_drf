@@ -1,98 +1,110 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import get_user_model
-from django.contrib import messages
-from django.urls import reverse
-from django.template.loader import render_to_string
-from django.conf import settings
-from django.http import Http404
-from django.views import View
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from rest_framework import status
+from rest_framework.views import APIView
 
 import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 
-from .forms import PasswordResetRequestForm, PasswordResetForm
 from .models import PasswordResetToken
+from user_profile.serializers import UserSerializer
+from .serializers import PasswordResetRequestSerializer, ResetPasswordSerializer
+
+from django.urls import reverse
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
 
-
-
-
-def send_password_reset_email(request):
-    form = PasswordResetRequestForm()
-    if request.method == 'POST':
-        form = PasswordResetRequestForm(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            try:
-                user = User.objects.get(email=email)
-            except User.DoesNotExist:
-                # messages.warning(request, 'No Profile matches the given query.')
-                raise Http404('No Profile matches the given query.')
-
-            token = PasswordResetToken(user=user)
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def send_password_reset_link_view(request):
+    data=request.data
+    serializer = PasswordResetRequestSerializer(data=data)
+    if serializer.is_valid():
+        email = serializer.validated_data['email']
+        # first_name = serializer.validated_data['first_name']
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'detail': 'No profile matches the given query.'}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            # Send Password Reset Link
+            token, created = PasswordResetToken.objects.get_or_create(email=email)
             token.generate_token()
-            token.save()
-
             # Email Sending API Config
             configuration = sib_api_v3_sdk.Configuration()
             configuration.api_key['api-key'] = settings.SENDINBLUE_API_KEY
             api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
-
             # Sending email
-            subject = 'Password Reset'
-            reset_url = request.build_absolute_uri(reverse('password_reset', kwargs={'token': token.token}))
-
-            # Update the context data for the email template
-            context = {
-                'user': user,
-                'reset_url': reset_url,
-            }
-            html_content = render_to_string('myaccount/password_reset_email.html', context)
-
+            subject = "Password Reset Request"
+            print("\nSending Password Reset link...")
+            first_name = user.first_name 
+            # first_name = data['first_name'].title() if data.get('first_name') else 'User'
+            # password_reset_url = request.build_absolute_uri(reverse('password_reset', kwargs={'token': token.token}))
+            password_reset_url = "http://localhost:3000/reset-password/" + token.token
+            html_content = f"""
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <title>Password Reset Request</title>
+                </head>
+                <body>
+                    <p>Hello { first_name.title() },</p>
+                    <p>You have requested to reset your password for your McdofGlobal account. 
+                    Click the link below to reset your password:</p>
+                    <p><a href="{ password_reset_url }" style="display: inline-block; 
+                    background-color: #2196f3; color: #fff; padding: 10px 20px; 
+                    text-decoration: none;">Verify Email Address</a></p>
+                    <p>This link is valid for 30 minutes.</p>
+                    <p>If you didn't initiate this password reset request, please ignore it.</p>
+                    <p>Best regards,</p>
+                    <p>McdofGlobal Team</p>
+                </body>
+            </html>
+            """
             sender_name = settings.EMAIL_SENDER_NAME
             sender_email = settings.EMAIL_HOST_USER
             sender = {"name": sender_name, "email": sender_email}
-            to = [{"email": email}]
+            to = [{"email": email, "name": first_name}]
             send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
                 to=to,
-                html_content=html_content,
+                html_content=html_content, 
                 sender=sender,
                 subject=subject
             )
             try:
                 api_response = api_instance.send_transac_email(send_smtp_email)
-                messages.success(request, 'An email with instructions to reset your password has been sent.')
-                return redirect('login')
+                print('\nPassord request link sent:', password_reset_url)
             except ApiException as e:
-                messages.warning(request, 'Failed to send password reset email.')
-                return redirect('password_reset_request')
+                print(e)
+            return Response({'detail': 'Passord request link sent successfully.'}, status=status.HTTP_200_OK)
+        except PasswordResetToken.DoesNotExist:
+            return Response({'detail': 'User not found. Please check the email and try again'}, status=status.HTTP_404_NOT_FOUND)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    return render(request, 'myaccount/password_reset_request.html', {'form': form})
 
-
-class PasswordResetView(View):
-    def get(self, request, token):
-        token_obj = get_object_or_404(PasswordResetToken, token=token)
-        if token_obj.is_valid():
-            form = PasswordResetForm(user=token_obj.user)
-            return render(request, 'myaccount/password_reset.html', {'form': form})
-        else:
-            messages.warning(request, 'The password reset link has expired or is invalid.')
-            return redirect('password_reset_request')
-
+class ResetPasswordView(APIView):
     def post(self, request, token):
-        token_obj = get_object_or_404(PasswordResetToken, token=token)
-        if token_obj.is_valid():
-            form = PasswordResetForm(user=token_obj.user, data=request.POST)
-            if form.is_valid():
-                form.save()
-                token_obj.delete()
-                messages.success(request, 'Your password has been reset successfully. You can now log in with your new password.')
-                return redirect('login')
+        data = request.data
+        serializer = ResetPasswordSerializer(data=data)
+        if serializer.is_valid():
+            new_password = serializer.validated_data['new_password']
+            try:
+                token_obj = PasswordResetToken.objects.get(token=token)
+                if token_obj.is_valid():
+                    user = User.objects.get(email=token_obj.email)
+                    user.set_password(new_password)
+                    user.save()
+                    token_obj.delete()  # Remove the token after successful reset
+                    return Response({'detail': 'Password reset successful'}, status=status.HTTP_200_OK)
+                else:
+                    return Response({'detail': 'Password reset link has expired'}, status=status.HTTP_400_BAD_REQUEST)
+            except PasswordResetToken.DoesNotExist:
+                return Response({'detail': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            messages.warning(request, 'The password reset link has expired or is invalid.')
-        return render(request, 'myaccount/password_reset.html', {'form': form})
-
-
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

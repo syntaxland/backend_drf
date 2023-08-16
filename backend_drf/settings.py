@@ -158,7 +158,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=600),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -432,6 +432,16 @@ AUTHENTICATION_BACKENDS = [
 SITE_ID = 1
 
 # Google OAuth2 settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': os.getenv('GOOGLE_OAUTH2_CLIENT_ID'),
+            'secret': os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET'),
+            'key': ''
+        }
+    }
+}
+
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {

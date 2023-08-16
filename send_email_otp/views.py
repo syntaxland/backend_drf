@@ -5,7 +5,7 @@ from rest_framework import status
 
 from .models import EmailOtp
 from .serializers import EmailOTPSerializer
-from user_profile.serializers import UserSerializer
+from user_profile.serializers import UserSerializer 
 
 from django.conf import settings
 from django.contrib.auth import get_user_model

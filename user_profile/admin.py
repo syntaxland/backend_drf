@@ -4,7 +4,7 @@ from . import models
 
 @admin.register(models.User)
 class AuthorAdmin(admin.ModelAdmin):
-    list_display = ('id', 'first_name', 'email', 'phone_number', 'is_verified', 'created_at')
+    list_display = ('email', 'created_at', 'id', 'first_name',  'phone_number', 'is_verified', 'is_staff', 'is_superuser', )
 
     # # Add custom methods to display 'email', 'first_name', 'last_name'
     # def username(self, obj):
