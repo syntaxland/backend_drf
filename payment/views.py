@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 # from paystack.resource import TransactionResource
-from app.models import Order
+from app.models import Product, Order, OrderItem, ShippingAddress
 from payment.models import Payment
 from .serializers import PaymentSerializer
 
@@ -57,13 +57,22 @@ def create_payment(request):
             user=user,
             reference=reference,
             amount=amount,
-            order_id=order_id,
+            order_id=order_id, 
         )
         # Associate the payment with the corresponding order
         try:
             order = Order.objects.get(order_id=order_id)
             order.isPaid = True
+            order.paidAt = payment.created_at
             order.save()
+
+            # order_item = OrderItem.objects.get(order=order)
+            # order_item.isPaid = True
+            # order_item.save()
+
+            # shipment = ShippingAddress.objects.get(order=order)
+            # shipment.isPaid = True
+            # shipment.save()
 
             # payment.user_profile = UserProfile.objects.get_or_create(user=request.user)[0]
 
@@ -77,3 +86,12 @@ def create_payment(request):
         return Response({'payment': serializer.data,}, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_payments(request):
+    user = request.user
+    payments = Payment.objects.filter(user=user).order_by('-created_at')
+    serializer = PaymentSerializer(payments, many=True)
+    return Response(serializer.data)

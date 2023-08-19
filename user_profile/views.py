@@ -12,6 +12,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from rest_auth.registration.views import SocialLoginView 
 
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
+# from allauth.socialaccount.providers.oauth2.views import SocialLoginView
+from rest_auth.registration.serializers import SocialLoginSerializer
+
 # from .models import UserProfile
 from .serializers import (
     UserSerializer,
@@ -21,6 +26,7 @@ from .serializers import (
     ChangePasswordSerializer,
     UpdateUserProfileSerializer,
     AvatarUpdateSerializer,
+    GoogleLoginSerializer
 )
 
 from send_email_otp.serializers import EmailOTPSerializer
@@ -85,9 +91,23 @@ def register_user_view(request):
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
-
-class LoginWithGoogleView(SocialLoginView):
+class GoogleLogin(SocialLoginView):
+    # permission_classes = [AllowAny]  
     adapter_class = GoogleOAuth2Adapter
+    client_class = OAuth2Client
+    serializer_class = GoogleLoginSerializer  
+    # callback_url = "http://localhost:3000"
+    # serializer_class = SocialLoginSerializer
+    # serializer_class = MyTokenObtainPairSerializer
+
+
+#     def get_serializer(self, *args, **kwargs):
+#         serializer_class = self.get_serializer_class()
+#         kwargs['context'] = self.get_serializer_context()
+#         return serializer_class(*args, **kwargs)
+
+
+# google_login = GoogleLogin.as_view()
 
 
 # from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter

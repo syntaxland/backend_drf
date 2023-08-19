@@ -20,17 +20,6 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-class Review(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    name = models.CharField(max_length=200, null=True, blank=True)
-    rating = models.IntegerField(null=True, blank=True, default=0)
-    comment = models.TextField(null=True, blank=True)
-    _id = models.AutoField(primary_key=True, editable=False)
-
-    def __str__(self):
-        return str(self.rating)
-
 
 class Order(models.Model):
     order_id = models.CharField(max_length=10, unique=True, blank=True, null=True)
@@ -46,6 +35,15 @@ class Order(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
     createdAt = models.DateTimeField(auto_now_add=True)
 
+    # email = models.EmailField(blank=True, null=True)  # Add this field
+    # first_name = models.CharField(max_length=50, blank=True, null=True)  # Add this field
+
+    # def save(self, *args, **kwargs):
+    #     if self.user:
+    #         self.email = self.user.email
+    #         self.first_name = self.user.first_name
+    #     super().save(*args, **kwargs)
+
     def __str__(self):
         return F"{self.order_id} - {str(self.user)} - {str(self.createdAt)}" 
 
@@ -53,6 +51,7 @@ class Order(models.Model):
 class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, related_name='orderItems')
+    # isPaid = models.BooleanField(default=False) 
     name = models.CharField(max_length=200, null=True, blank=True)
     qty = models.IntegerField(null=True, blank=True, default=0)
     price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
@@ -64,7 +63,9 @@ class OrderItem(models.Model):
 
 
 class ShippingAddress(models.Model):
-    order = models.OneToOneField(Order, on_delete=models.CASCADE, null=True, blank=True, related_name='shippingAddress')
+    order = models.OneToOneField(Order, on_delete=models.SET_NULL, null=True, blank=True, related_name='shippingAddress')
+    isPaid = models.BooleanField(default=False)
+    isDelivered = models.BooleanField(default=False)
     address = models.CharField(max_length=200, null=True, blank=True)
     city = models.CharField(max_length=200, null=True, blank=True)
     postalCode = models.CharField(max_length=200, null=True, blank=True)
@@ -74,3 +75,16 @@ class ShippingAddress(models.Model):
 
     def __str__(self):
         return self.address
+
+class Review(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    # order = models.OneToOneField(Order, on_delete=models.SET_NULL, null=True, blank=True, related_name='review')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    # isPaid = models.BooleanField(default=False)
+    name = models.CharField(max_length=200, null=True, blank=True)
+    rating = models.IntegerField(null=True, blank=True, default=0)
+    comment = models.TextField(null=True, blank=True)
+    _id = models.AutoField(primary_key=True, editable=False)
+
+    def __str__(self):
+        return str(self.rating)

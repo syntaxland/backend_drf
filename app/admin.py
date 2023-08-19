@@ -10,7 +10,7 @@ class AuthorAdmin(admin.ModelAdmin):
 
 @admin.register(models.Order)
 class AuthorAdmin(admin.ModelAdmin):
-    list_display = ('createdAt', 'order_id', '_id', 'user', 'totalPrice', 'isPaid', 'paymentMethod', 'isDelivered') 
+    list_display = ('order_id', 'createdAt', 'user', 'totalPrice', 'isPaid', 'paymentMethod', 'isDelivered') 
     search_fields = ('order_id',)
     
 
@@ -24,4 +24,6 @@ class AuthorAdmin(admin.ModelAdmin):
     list_display = ('address', 'order', 'city', 'shippingPrice') 
 
 
-admin.site.register(models.OrderItem)
+@admin.register(models.OrderItem)
+class AuthorAdmin(admin.ModelAdmin):
+    list_display = ('product', 'order', 'qty', 'price', 'image') 

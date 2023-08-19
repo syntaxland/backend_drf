@@ -3,7 +3,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from app.models import Product
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Product, Review, Order, OrderItem, ShippingAddress
+from .models import Product, Review, Order, OrderItem, ShippingAddress, Review
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -23,12 +23,17 @@ class ShippingAddressSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class OrderSerializer(serializers.ModelSerializer):
+class OrderSerializer(serializers.ModelSerializer): 
     orderItems = OrderItemSerializer(many=True)
     shippingAddress = ShippingAddressSerializer()
 
     class Meta:
         model = Order
+        fields = '__all__'
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
         fields = '__all__'
 
 class UserSerializer(serializers.ModelSerializer):
@@ -53,13 +58,13 @@ class UserSerializer(serializers.ModelSerializer):
         return obj.is_staff
 
 
-class UserSerializerWithToken(UserSerializer):
-    token = serializers.SerializerMethodField(read_only=True)
+# class UserSerializerWithToken(UserSerializer):
+#     token = serializers.SerializerMethodField(read_only=True)
 
-    class Meta:
-        model = User
-        fields = ['id', '_id', 'username', 'email', 'name', 'isAdmin', 'token']
+#     class Meta:
+#         model = User
+#         fields = ['id', '_id', 'username', 'email', 'name', 'isAdmin', 'token']
 
-    def get_token(self, obj):
-        token = RefreshToken.for_user(obj)
-        return str(token.access_token)
+#     def get_token(self, obj):
+#         token = RefreshToken.for_user(obj)
+#         return str(token.access_token)
