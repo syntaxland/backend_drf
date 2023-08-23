@@ -26,4 +26,4 @@ class AuthorAdmin(admin.ModelAdmin):
 
 @admin.register(models.OrderItem)
 class AuthorAdmin(admin.ModelAdmin):
-    list_display = ('product', 'order', 'qty', 'price', 'image') 
+    list_display = ('_id', 'product', 'order', 'qty', 'price', 'image') 

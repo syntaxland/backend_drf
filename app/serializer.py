@@ -4,34 +4,62 @@ from django.contrib.auth.models import User
 from app.models import Product
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Product, Review, Order, OrderItem, ShippingAddress, Review
-
+from user_profile.serializers import UserSerializer
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
         
+
+class OrderSerializer(serializers.ModelSerializer): 
+    user = UserSerializer()
+
+    class Meta:
+        model = Order
+        fields = '__all__'
+
+
 class OrderItemSerializer(serializers.ModelSerializer):
+    order = OrderSerializer()
+    user = UserSerializer()
+    order_id = serializers.CharField(source='order.order_id', read_only=True)
+    # isPaid = serializers.CharField(source='order.isPaid', read_only=True)
+    email = serializers.CharField(source='order.user.email', read_only=True)
+    first_name = serializers.CharField(source='order.user.first_name', read_only=True)
+
     class Meta:
         model = OrderItem
         fields = '__all__'
 
 
 class ShippingAddressSerializer(serializers.ModelSerializer):
+    order = OrderSerializer()
+    user = UserSerializer()
+    order_id = serializers.CharField(source='order.order_id', read_only=True)
+    email = serializers.CharField(source='order.user.email', read_only=True)
+    first_name = serializers.CharField(source='order.user.first_name', read_only=True)
+
     class Meta:
         model = ShippingAddress
         fields = '__all__'
 
 
-class OrderSerializer(serializers.ModelSerializer): 
-    orderItems = OrderItemSerializer(many=True)
-    shippingAddress = ShippingAddressSerializer()
-
-    class Meta:
-        model = Order
-        fields = '__all__'
-
 class ReviewSerializer(serializers.ModelSerializer):
+    order = OrderSerializer()
+    user = UserSerializer()
+    product = ProductSerializer()
+    order_item = OrderItemSerializer()
+    order_id = serializers.CharField(source='order.order_id', read_only=True)
+    email = serializers.CharField(source='order.user.email', read_only=True)
+    first_name = serializers.CharField(source='order.user.first_name', read_only=True)
+
+    order_item = OrderItemSerializer()
+    order_id = serializers.CharField(source='order_item.order.order_id', read_only=True)
+    # email = serializers.CharField(source='order_item.user.email', read_only=True)
+    # product = serializers.CharField(source='order_item.product.name', read_only=True)
+    # first_name = serializers.CharField(source='order_item.user.first_name', read_only=True)
+
     class Meta:
         model = Review
         fields = '__all__'

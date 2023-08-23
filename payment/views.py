@@ -6,11 +6,12 @@ from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.http import JsonResponse
 from django.http import Http404
+from django.db.models import Sum
 
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.decorators import api_view, permission_classes
 # from paystack.resource import TransactionResource
 from app.models import Product, Order, OrderItem, ShippingAddress
@@ -52,16 +53,20 @@ def create_payment(request):
         if not order_id:
             return Response({'detail': 'Order ID not found.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Create the Payment instance
-        payment = Payment.objects.create(
-            user=user,
-            reference=reference,
-            amount=amount,
-            order_id=order_id, 
-        )
+        
         # Associate the payment with the corresponding order
         try:
             order = Order.objects.get(order_id=order_id)
+            # order = Order.objects.get(order_id=order_id)
+
+            # Create the Payment instance
+            payment = Payment.objects.create(
+                user=user,
+                reference=reference,
+                amount=amount,
+                order=order,
+            )
+
             order.isPaid = True
             order.paidAt = payment.created_at
             order.save()
@@ -90,8 +95,24 @@ def create_payment(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_payments(request):
+def get_user_payments(request):
     user = request.user
     payments = Payment.objects.filter(user=user).order_by('-created_at')
     serializer = PaymentSerializer(payments, many=True)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_payments(request):
+    payments = Payment.objects.all().order_by('-created_at')
+    serializer = PaymentSerializer(payments, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+# @permission_classes([IsAdminUser])
+@permission_classes([IsAuthenticated])
+def get_all_payments(request):
+    payments = Payment.objects.values('user__username').annotate(total=Sum('amount')).order_by('user')
+    return Response(payments)
