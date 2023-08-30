@@ -16,7 +16,7 @@ from rest_framework.decorators import api_view, permission_classes
 # from paystack.resource import TransactionResource
 from app.models import Product, Order, OrderItem, ShippingAddress
 from payment.models import Payment
-from .serializers import PaymentSerializer
+from .serializers import PaymentSerializer, UserPaymentSerializer
 
 
 def generate_payment_reference():
@@ -98,21 +98,35 @@ def create_payment(request):
 def get_user_payments(request):
     user = request.user
     payments = Payment.objects.filter(user=user).order_by('-created_at')
-    serializer = PaymentSerializer(payments, many=True)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_payments(request):
-    payments = Payment.objects.all().order_by('-created_at')
-    serializer = PaymentSerializer(payments, many=True)
+    serializer = UserPaymentSerializer(payments, many=True)
     return Response(serializer.data)
 
 
 @api_view(['GET'])
 # @permission_classes([IsAdminUser])
 @permission_classes([IsAuthenticated])
-def get_all_payments(request):
-    payments = Payment.objects.values('user__username').annotate(total=Sum('amount')).order_by('user')
-    return Response(payments)
+def get_all_payments_view(request):
+    try:
+        all_payments = Payment.objects.all().order_by('-created_at')
+        serializer = PaymentSerializer(all_payments, many=True)
+        return Response(serializer.data)
+    except Payment.DoesNotExist:
+        return Response({'detail': 'Credit point not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+# def get_payments(request):
+#     payments = Payment.objects.all().order_by('-created_at')
+#     serializer = PaymentSerializer(payments, many=True)
+#     return Response(serializer.data)
+
+ 
+# @api_view(['GET'])
+# # @permission_classes([IsAdminUser])
+# @permission_classes([IsAuthenticated])
+# def get_all_payments(request):
+#     payments = Payment.objects.values('user__username').annotate(total=Sum('amount')).order_by('user')
+#     return Response(payments)
+  
+

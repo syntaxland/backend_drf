@@ -1,10 +1,14 @@
 from django.db import models
 from rest_framework import serializers
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from app.models import Product
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Product, Review, Order, OrderItem, ShippingAddress, Review
 from user_profile.serializers import UserSerializer
+
+from django.contrib.auth import get_user_model
+
+User = get_user_model()  
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,7 +26,6 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class OrderItemSerializer(serializers.ModelSerializer):
     order = OrderSerializer()
-    user = UserSerializer()
     order_id = serializers.CharField(source='order.order_id', read_only=True)
     # isPaid = serializers.CharField(source='order.isPaid', read_only=True)
     email = serializers.CharField(source='order.user.email', read_only=True)
@@ -35,7 +38,6 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class ShippingAddressSerializer(serializers.ModelSerializer):
     order = OrderSerializer()
-    user = UserSerializer()
     order_id = serializers.CharField(source='order.order_id', read_only=True)
     email = serializers.CharField(source='order.user.email', read_only=True)
     first_name = serializers.CharField(source='order.user.first_name', read_only=True)
@@ -50,11 +52,6 @@ class ReviewSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     product = ProductSerializer()
     order_item = OrderItemSerializer()
-    order_id = serializers.CharField(source='order.order_id', read_only=True)
-    email = serializers.CharField(source='order.user.email', read_only=True)
-    first_name = serializers.CharField(source='order.user.first_name', read_only=True)
-
-    order_item = OrderItemSerializer()
     order_id = serializers.CharField(source='order_item.order.order_id', read_only=True)
     # email = serializers.CharField(source='order_item.user.email', read_only=True)
     # product = serializers.CharField(source='order_item.product.name', read_only=True)
@@ -63,6 +60,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
+
 
 class UserSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)

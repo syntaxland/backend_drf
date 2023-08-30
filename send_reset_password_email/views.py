@@ -28,7 +28,7 @@ def send_password_reset_link_view(request):
         email = serializer.validated_data['email']
         # first_name = serializer.validated_data['first_name']
         try:
-            user = User.objects.get(email=email)
+            user = User.objects.get(email=email) 
         except User.DoesNotExist:
             return Response({'detail': 'No profile matches the given query.'}, status=status.HTTP_404_NOT_FOUND)
         try:
@@ -59,7 +59,7 @@ def send_password_reset_link_view(request):
                     Click the link below to reset your password:</p>
                     <p><a href="{ password_reset_url }" style="display: inline-block; 
                     background-color: #2196f3; color: #fff; padding: 10px 20px; 
-                    text-decoration: none;">Verify Email Address</a></p>
+                    text-decoration: none;">Reset Password</a></p>
                     <p>This link is valid for 30 minutes.</p>
                     <p>If you didn't initiate this password reset request, please ignore it.</p>
                     <p>Best regards,</p>

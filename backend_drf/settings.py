@@ -129,7 +129,10 @@ INSTALLED_APPS = [
     'user_profile', 
     'send_email_otp',
     'send_reset_password_email',
-  
+    'credit_point',  
+    'send_email_message',
+    'send_message_inbox', 
+
     # Third-party apps
     'rest_framework',
     'rest_framework_simplejwt',
@@ -158,7 +161,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=90),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=900),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,

@@ -22,6 +22,10 @@ urlpatterns = [
     path('api/', include('send_email_otp.urls')), 
     path('api/', include('send_reset_password_email.urls')), 
     path('api/', include('payment.urls')),
+    path('api/', include('credit_point.urls')),
+    path('api/', include('send_email_message.urls')),
+    path('api/', include('send_message_inbox.urls')),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

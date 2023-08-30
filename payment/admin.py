@@ -4,7 +4,7 @@ from . import models
 
 @admin.register(models.Payment)
 class AuthorAdmin(admin.ModelAdmin):
-    list_display = ('created_at', 'user', 'order', 'amount', 'reference',)
+    list_display = ('created_at', 'amount', 'order', 'user', 'reference',)
     search_fields = ('order_id', 'reference', 'email') 
 
     # def first_name(self, obj):

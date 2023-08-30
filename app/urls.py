@@ -18,11 +18,14 @@ urlpatterns = [
     path('get-order-id/', views.get_order_id, name='get_order_id'),
 
     path('get-user-orders/', views.get_user_orders, name='get-user-orders'),
+    path('get-all-orders/', views.get_all_orders_view, name='get-all-orders'),
+    
     path('delete-orders/<int:pk>/', views.delete_user_order, name='delete-order'),
-    path('save-shipment/', views.save_shipment, name='save_shipment'),
     path('get-order-items/', views.get_order_items, name='get-order-items'),
 
-    path('get-shipping-address/', views.get_shipping_address, name='get-shipping-address'),
+    path('save-shipment/', views.save_shipment, name='save_shipment'),
+    path('get-user-shipments/', views.get_user_shipments, name='get-user-shipments'),
+    path('get-all-users-shipments/', views.get_all_user_shipments, name='get-all-user-shipments'),
 
     path('get-user-reviews/', views.get_user_reviews, name='get-user-reviews'),
     path('review-list/<int:product_id>/', views.review_list_view, name='review-list'),
