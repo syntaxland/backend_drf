@@ -11,7 +11,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from rest_framework import status, generics
 from rest_framework.views import APIView
- 
+
 # from django.core import serializers
 from django.db.models import Avg
 from django.core.exceptions import ObjectDoesNotExist

@@ -1,6 +1,7 @@
 import random
 import string
 import requests
+from decimal import Decimal
 
 from django.shortcuts import get_object_or_404
 from django.conf import settings
@@ -17,7 +18,7 @@ from rest_framework.decorators import api_view, permission_classes
 from app.models import Product, Order, OrderItem, ShippingAddress
 from payment.models import Payment
 from .serializers import PaymentSerializer, UserPaymentSerializer
-
+from credit_point.models import CreditPoint
 
 def generate_payment_reference():
     return ''.join(random.choices(string.digits, k=10))
@@ -71,18 +72,29 @@ def create_payment(request):
             order.paidAt = payment.created_at
             order.save()
 
-            # order_item = OrderItem.objects.get(order=order)
-            # order_item.isPaid = True
-            # order_item.save()
-
-            # shipment = ShippingAddress.objects.get(order=order)
-            # shipment.isPaid = True
-            # shipment.save()
-
-            # payment.user_profile = UserProfile.objects.get_or_create(user=request.user)[0]
-
             payment.save()
             print('Payment details:', payment)
+
+            # Calculate the credit points earned (1% of payment amount)
+            # credit_points_earned = amount * 0.01
+            credit_points_earned = Decimal(str(amount)) * Decimal('0.01')
+
+            try:
+                # Get or create the user's credit point balance
+                credit_point, created = CreditPoint.objects.get_or_create(
+                    user=request.user,
+                    # credit_points_earned=credit_points_earned
+                    )
+                # credit_point = CreditPoint.objects.create(
+                #     user=request.user,
+                #     )
+                credit_point.balance += credit_points_earned
+                credit_point.save()
+                print('Credit points added:', credit_point, credit_points_earned)
+                return Response({'detail': 'Credit points added.'}, status=status.HTTP_201_CREATED)
+            except CreditPoint.DoesNotExist:
+                pass
+
             # Return a success response
             return Response({'detail': 'Payment successful'}, status=status.HTTP_200_OK)
         except Order.DoesNotExist:
@@ -104,7 +116,7 @@ def get_user_payments(request):
 
 @api_view(['GET'])
 # @permission_classes([IsAdminUser])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated]) 
 def get_all_payments_view(request):
     try:
         all_payments = Payment.objects.all().order_by('-created_at')

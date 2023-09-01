@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CreditPointRequest
+from .models import CreditPoint, CreditPointRequest
 from django.contrib.auth import get_user_model
 
 User = get_user_model() 
@@ -11,3 +11,9 @@ class CreditPointRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = CreditPointRequest
         fields = '__all__'
+
+
+class CreditPointSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CreditPoint
+        fields = "__all__"
