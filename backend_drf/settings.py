@@ -132,6 +132,9 @@ INSTALLED_APPS = [
     'credit_point',  
     'send_email_message',
     'send_message_inbox', 
+    'recommender',
+    'live_chat',
+    'promo',
 
     # Third-party apps
     'rest_framework',
@@ -146,6 +149,7 @@ INSTALLED_APPS = [
 
     'corsheaders',
     'storages',
+    'channels',
 ]
 
 # Adding JWT Auth
@@ -161,7 +165,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=900),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1200),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -227,6 +231,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend_drf.wsgi.application'
 
+# # WebSocket configuration
+# ASGI_APPLICATION = 'backend_drf.routing.application'
+
+# # Channels Layer
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             "hosts": [('127.0.0.1', 6379)],
+#         },
+#     },
+# }
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases

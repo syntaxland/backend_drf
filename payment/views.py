@@ -109,7 +109,7 @@ def create_payment(request):
 @permission_classes([IsAuthenticated])
 def get_user_payments(request):
     user = request.user
-    payments = Payment.objects.filter(user=user).order_by('-created_at')
+    payments = Payment.objects.filter(user=user).order_by('-created_at') 
     serializer = UserPaymentSerializer(payments, many=True)
     return Response(serializer.data)
 

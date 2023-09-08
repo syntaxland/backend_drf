@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -8,6 +8,12 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView, 
     TokenVerifyView, 
 )
+from live_chat import consumers
+
+websocket_urlpatterns = [
+    re_path(r'ws/chat/(?P<room_name>\w+)/$', consumers.ChatConsumer.as_asgi()),
+]
+
 
 urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -25,6 +31,9 @@ urlpatterns = [
     path('api/', include('credit_point.urls')),
     path('api/', include('send_email_message.urls')),
     path('api/', include('send_message_inbox.urls')),
+    path('api/', include('recommender.urls')),
+    path('api/', include('live_chat.urls')),
+    # path('api/', include('promo.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -4,7 +4,7 @@ from . import models
 
 @admin.register(models.Product)
 class AuthorAdmin(admin.ModelAdmin):
-    list_display = ('name', '_id', 'price', 'countInStock', 'rating', 'numReviews', 'createdAt', ) 
+    list_display = ('name', '_id', 'price', 'promo_price', 'save_count', 'view_count', 'countInStock', 'rating', 'numReviews', 'createdAt', )  
     search_fields = ('name',)
 
 

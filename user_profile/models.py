@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
-
+# from app.models import Product
 
 class CustomUserManager(BaseUserManager):
     """Define a model manager for User model with no username field."""
@@ -42,11 +42,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(max_length=15, unique=True)
     is_verified = models.BooleanField(default=False)
     avatar = models.ImageField(upload_to='images/avatars/', null=True, blank=True)
-    # favorites = models.ManyToManyField(Product, related_name='favorited_by')
+    favorite_products = models.ManyToManyField('app.Product', related_name='favorited_by') 
+    viewed_products = models.ManyToManyField('app.Product', related_name='viewed_products')  
     is_staff = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)  
     created_at = models.DateTimeField(default=timezone.now, blank=True)
-
+ 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'phone_number']
 

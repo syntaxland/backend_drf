@@ -56,38 +56,4 @@ def message_inbox_view(request):
         return Response({'detail': 'Messages not found'}, status=status.HTTP_404_NOT_FOUND)
     
 
-# class SendMessageView(generics.ListCreateAPIView):
-#     queryset = SendMessageInbox.objects.all()
-#     serializer_class = SendMessageInboxSerializer
-#     permission_classes = [IsAuthenticated]
-
-#     def perform_create(self, serializer):
-#         serializer.save(sender=self.request.user)
-
-
-# @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-# def message_inbox_view(request):
-#     user = request.user
-#     message_inbox = SendMessageInbox.objects.filter(receiver=user).order_by('-timestamp')
-#     serializer = SendMessageInboxSerializer(message_inbox, many=True)
-#     return Response(serializer.data)
-
-
-
-
-
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])  
-# def send_message_inbox_view(request):
-#     user = request.user
-#     data = request.data
-    # data['user'] = user.id 
-
-    # serializer = CreditPointRequestSerializer(data=data)
-    # if serializer.is_valid():
-    #     serializer.save()
-    #     return Response({'success': 'Credit point request submitted successfully.'})
-    # return Response(serializer.errors, status=400)
-
 
