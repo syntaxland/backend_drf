@@ -149,7 +149,7 @@ INSTALLED_APPS = [
 
     'corsheaders',
     'storages',
-    'channels',
+    # 'channels',
 ]
 
 # Adding JWT Auth
