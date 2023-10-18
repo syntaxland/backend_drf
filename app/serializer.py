@@ -1,3 +1,4 @@
+# app/serializers.py
 from django.db import models
 from rest_framework import serializers
 # from django.contrib.auth.models import User
@@ -5,12 +6,18 @@ from app.models import Product
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Product, Review, Order, OrderItem, ShippingAddress, Review
 from user_profile.serializers import UserSerializer
+from promo.serializers import PromoCodeSerializer
+
 
 from django.contrib.auth import get_user_model
 
 User = get_user_model()  
 
 class ProductSerializer(serializers.ModelSerializer):
+    promo_code = serializers.CharField(source='promo_code.promo_code', read_only=True)
+    expiration_date = serializers.CharField(source='promo_code.expiration_date', read_only=True)
+    discount_percentage = serializers.CharField(source='promo_code.discount_percentage', read_only=True)
+
     class Meta:
         model = Product
         fields = '__all__'

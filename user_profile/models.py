@@ -1,3 +1,4 @@
+# user_profile/models.py
 from django.db import models
 from django.contrib.auth.models import AbstractUser, AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
@@ -39,15 +40,18 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=100, unique=True)
     first_name = models.CharField(max_length=30, null=True, blank=True)
     last_name = models.CharField(max_length=30, null=True, blank=True)
-    phone_number = models.CharField(max_length=15, unique=True)
+    phone_number = models.CharField(max_length=18, unique=True)
     is_verified = models.BooleanField(default=False)
-    avatar = models.ImageField(upload_to='images/avatars/', null=True, blank=True)
+    avatar = models.ImageField(upload_to='images/avatars/', null=True, blank=True) 
     favorite_products = models.ManyToManyField('app.Product', related_name='favorited_by') 
     viewed_products = models.ManyToManyField('app.Product', related_name='viewed_products')  
+    referral_code = models.CharField(max_length=10, unique=True, null=True) 
+    referral_link = models.CharField(max_length=225, unique=True, null=True)
+    # referred_users = models.ManyToManyField('promo.Referral', related_name='referred_users')   
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)  
     created_at = models.DateTimeField(default=timezone.now, blank=True)
- 
+  
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'phone_number']
 

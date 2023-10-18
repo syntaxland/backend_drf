@@ -1,3 +1,4 @@
+# backend_drf/settings.py
 """
 Django settings for backend_drf project.
 
@@ -19,83 +20,6 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
-
-#--------------------------------------------------------------------------------------------------
-""" 
-# AWS Secrets Manager for S3 Media Storages, Secret Keys, DB Env...
-import json
-import boto3
-import base64
-from botocore.exceptions import ClientError
-
-def lambda_handler(event, context):
-    environment  = event['env']
-    secret_name = 'mcdof/store/%s/keys' % environment
-    region_name = "us-east-1"
-    # Create a Secrets Manager client
-    session = boto3.session.Session()
-    client = session.client(
-        service_name='secretsmanager',
-        region_name=region_name
-    )
-    try:
-        secret_value_response = client.get_secret_value(
-            SecretId=secret_name
-        )
-    except ClientError as e:
-        raise e
-    else:
-        if 'SecretString' in secret_value_response:
-            secret = json.loads(secret_value_response['SecretString'])
-            return secret
-        else:
-            decode_binary_secret = base64.base64decode(secret_value_response['SecretBinary'])
-            return decode_binary_secret
-"""
-# OR
-"""
-import os
-import json
-import boto3
-from django.core.exceptions import ImproperlyConfigured
-
-# Helper function to get environment variables or raise an error
-def get_env_variable(var_name):
-    try:
-        return os.environ[var_name]
-    except KeyError:
-        error_msg = f"Environment variable '{var_name}' not set"
-        raise ImproperlyConfigured(error_msg)
-
-# Load Secrets Manager secrets
-def load_secrets():
-    secret_name = "your-secret-name"  
-    region_name = "your-aws-region"  
-
-    session = boto3.session.Session()
-    client = session.client(
-        service_name='secretsmanager',
-        region_name=region_name
-    )
-    response = client.get_secret_value(SecretId=secret_name)
-
-    if 'SecretString' in response:
-        secret = response['SecretString']
-    else:
-        secret = json.loads(response['SecretBinary'])
-
-    return json.loads(secret)
-
-# Load secrets from AWS Secrets Manager
-secrets = load_secrets()
-
-# Django Secret Key
-SECRET_KEY = get_env_variable('SECRET_KEY') or secrets.get('SECRET_KEY')
-"""
-#--------------------------------------------------------------------------------------------------
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
 # SECRET_KEY = 'django-insecure-_#gopr9mlt-y5v4bi*7shrfhau)&5kyznb9!yjh)9m+t16-0q+'
@@ -104,7 +28,7 @@ DEBUG = True
 # DEBUG = False
 
 # ALLOWED_HOSTS = ['localhost', 
-#                  'localhost:8000', 
+#                  'localhost:8000',  
 #                  '127.0.0.1', 
 #                  '127.0.0.1:8000', 
 #                  '54.34.229.79.247', 
@@ -124,7 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Myapps 
-    'app.apps.AppConfig', 
+    'app', 
     'payment',
     'user_profile', 
     'send_email_otp',
@@ -135,6 +59,10 @@ INSTALLED_APPS = [
     'recommender',
     'live_chat',
     'promo',
+    'sellers',
+    'support',
+    'feedback',
+    # 'products',
 
     # Third-party apps
     'rest_framework',
@@ -149,7 +77,10 @@ INSTALLED_APPS = [
 
     'corsheaders',
     'storages',
-    # 'channels',
+    'channels', 
+    # 'channels_socketio',
+    'django_celery_results',
+    'django_celery_beat',
 ]
 
 # Adding JWT Auth
@@ -164,9 +95,9 @@ REST_FRAMEWORK = {
     ]
 }
 
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1200),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+SIMPLE_JWT = {      
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=7), 
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
@@ -229,20 +160,31 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'backend_drf.wsgi.application'
+WSGI_APPLICATION = 'backend_drf.wsgi.application' 
 
-# # WebSocket configuration
-# ASGI_APPLICATION = 'backend_drf.routing.application'
+# WebSocket configuration
+# ASGI_APPLICATION = "backend_drf.asgi.application"
+ASGI_APPLICATION = "backend_drf.routing.application"
 
-# # Channels Layer
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-#         'CONFIG': {
-#             "hosts": [('127.0.0.1', 6379)],
-#         },
-#     },
-# }
+
+"""
+# Channels Layer
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')], 
+        },
+    },
+}
+"""
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
@@ -358,7 +300,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Lagos'
 
 USE_I18N = True
 
@@ -479,3 +422,13 @@ LOGOUT_REDIRECT_URL = '/login'
 
 AUTH_USER_MODEL = 'user_profile.User' 
 
+# Celery Configuration
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  
+CELERY_RESULT_BACKEND = 'django-db'  
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+CELERY_BEAT_SHEDULER = 'django-celery-beat.shedulers.DatabaseSheduler'

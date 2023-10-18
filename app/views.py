@@ -1,3 +1,4 @@
+# app/views.py
 import random
 import string
 from django.db import IntegrityError
@@ -13,6 +14,7 @@ from rest_framework import status, generics, filters
 from rest_framework.views import APIView
 
 # from django.core import serializers
+from decimal import Decimal
 from django.db.models import Avg
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.hashers import make_password
@@ -57,7 +59,6 @@ def create_order(request):
     orderItems = data['orderItems']
     if orderItems and len(orderItems) == 0:
         return Response({'detail': 'No Order Items.'}, status=status.HTTP_400_BAD_REQUEST)
-
     
     # Accessing the order_id 
     order_id = data.get('order_id')
@@ -65,6 +66,11 @@ def create_order(request):
     if not order_id:
         return Response({'detail': 'Order ID not found.'}, status=status.HTTP_400_BAD_REQUEST)
 
+    # promo_discount = data.get('promoDiscount', 0)
+    # promo_discount = Decimal(data.get('promo_discount', 0))
+    # promo_total_price = data.get('promo_total_price', 0)
+    # print('create_order promo_discount:', promo_discount)
+    
     # Create order
     order = Order.objects.create(
         user=user,
@@ -73,6 +79,9 @@ def create_order(request):
         shippingPrice=data['shippingPrice'],
         totalPrice=data['totalPrice'],
         order_id=order_id,
+
+        # promo_discount=promo_discount,
+        # promo_total_price=promo_total_price
     ) 
 
     # Create order items
@@ -338,42 +347,7 @@ def confirm_order_delivery(request, pk):
         return Response(serializer.data)
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-# class TrackProductView(APIView):
-#     def post(self, request, pk):
-#         try:
-#             product = Product.objects.get(pk=pk)
-#             product.view_count += 1
-#             product.save()
-#             return Response(status=status.HTTP_200_OK)
-#         except Product.DoesNotExist:
-#             return Response(status=status.HTTP_404_NOT_FOUND)
-        
-
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated]) 
-# def track_product_view(request, user_id, pk):
-#     try:
-#         product = get_object_or_404(Product, pk=pk)
-#         user = User.objects.get(id=user_id)
-
-#         print("User ID:", user_id)
-#         print("Product ID:", pk)
-#         print("Viewed Products:", user.viewed_products.all())
-
-#         if product in user.viewed_products.all():
-#             return Response({'message': 'Product already viewed.'}, status=status.HTTP_200_OK)
-
-#         product.view_count += 1
-#         product.save()
-
-#         user.viewed_products.add(product)
-
-#         return Response({'message': 'Product viewed added successfully.'}, status=status.HTTP_200_OK)
-#     except Exception as e: 
-#         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
+    
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated]) 
@@ -398,7 +372,6 @@ def track_product_view(request, user_id, pk):
         return Response({'message': 'Product viewed added successfully.'}, status=status.HTTP_200_OK)
     except Exception as e: 
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    
     
 
 @api_view(['GET'])
@@ -477,10 +450,9 @@ def get_user_favorite_products(request):
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
 
-
 @api_view(['GET'])
 def getProducts(request):
-    products = Product.objects.all()
+    products = Product.objects.all().order_by('-createdAt')
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data)
 
@@ -608,8 +580,6 @@ class ProductSearchList(generics.ListAPIView):
         
         print("Generated SQL Query:", str(queryset.query))
 
-        
-
         # Create filters based on the provided query parameters
         if keyword:
             queryset = queryset.filter(
@@ -647,3 +617,4 @@ class ProductSearchList(generics.ListAPIView):
 
         return queryset.order_by(sortOrder)
 
+ 

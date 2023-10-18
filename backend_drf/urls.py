@@ -1,3 +1,4 @@
+# backend_drf/urls.py
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.conf import settings
@@ -8,11 +9,11 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView, 
     TokenVerifyView, 
 )
-from live_chat import consumers
+# from live_chat import consumers
 
-websocket_urlpatterns = [
-    re_path(r'ws/chat/(?P<room_name>\w+)/$', consumers.ChatConsumer.as_asgi()),
-]
+# websocket_urlpatterns = [
+#     re_path(r'ws/chat/(?P<room_name>\w+)/$', consumers.ChatConsumer.as_asgi()),
+# ]
 
 
 urlpatterns = [
@@ -33,7 +34,11 @@ urlpatterns = [
     path('api/', include('send_message_inbox.urls')),
     path('api/', include('recommender.urls')),
     path('api/', include('live_chat.urls')),
-    # path('api/', include('promo.urls')),
+    path('', include('live_chat.urls')),
+    path('api/', include('sellers.urls')),
+    path('api/', include('promo.urls')),
+    path('api/', include('support.urls')),
+    path('api/', include('feedback.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
@@ -41,3 +46,6 @@ urlpatterns = [
 # urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
+# urlpatterns += [
+#     path('ws/', include('backend_drf.routing.websocket_urlpatterns')),
+# ]

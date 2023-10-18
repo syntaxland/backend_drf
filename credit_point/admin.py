@@ -16,3 +16,19 @@ class AuthorAdmin(admin.ModelAdmin):
                     'user', 
                     # 'credit_points_earned', 
                     'balance', )
+
+@admin.register(models.CreditPointPayment)
+class AuthorAdmin(admin.ModelAdmin):
+    list_display = ('created_at', 
+                    'referrer', 
+                    'referral_credit_points_bonus',
+                     'order_payment', )
+
+
+@admin.register(models.CreditPointEarning)
+class AuthorAdmin(admin.ModelAdmin):
+    list_display = ('created_at',
+                     'user', 
+                    'credit_points_earned', 
+                    'order_payment',                  
+                      )

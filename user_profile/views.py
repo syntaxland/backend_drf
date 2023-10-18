@@ -1,4 +1,4 @@
-
+# user_profile/views.py
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
@@ -30,9 +30,8 @@ from .serializers import (
 )
 
 from send_email_otp.serializers import EmailOTPSerializer
+from promo.models import Referral
 from send_email_otp.models import EmailOtp
-from send_email_otp.send_email_otp_sendinblue import send_email_otp, resend_email_otp
-# from send_email_otp.views import verify_email_otp
 from send_email_otp.models import EmailOtp
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.hashers import make_password
@@ -76,6 +75,30 @@ def register_user_view(request):
                 phone_number=data.get('phone_number'),
                 password=data.get('password'),
             )
+
+        # Check if the user has a referral code in the URL
+        referral_code = data.get('referral_code')
+        print('referral_code:', referral_code)
+        
+        if referral_code:
+            try:
+                # Find the user associated with the referral code
+                referrer = User.objects.get(referral_code=referral_code) 
+                
+                # Check if a Referral object already exists for the referrer
+                referral, created = Referral.objects.get_or_create(referrer=referrer)
+                
+                # Add the user to the referrer's referred_users ManyToMany field
+                referral.referred_users.add(user)
+                # referral.user_count += 1
+                
+                # Save the referrer instance
+                referrer.save()
+                print('user added to referred_users of referrer:', user)
+            except User.DoesNotExist:
+                pass
+
+
             print('\nUser created! Verify your email.')
             # Now, based on whether the user is verified or not, set the response status and message
         if user.is_verified:

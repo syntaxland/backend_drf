@@ -11,7 +11,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework import status
 
 import sib_api_v3_sdk
-from sib_api_v3_sdk.rest import ApiException
+from sib_api_v3_sdk.rest import ApiException 
 
 from django.db.models import Q
 from django.conf import settings
@@ -75,7 +75,7 @@ def send_email_to_all_users(request):
         print("\nEmail saved!")
         return Response({'detail': 'Email sent successfully.'}, status=status.HTTP_201_CREATED)
 
-    return Response({'detail': 'Invalid request.'}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({'detail': 'Invalid request.'}, status=status.HTTP_400_BAD_REQUEST) 
 
 # @api_view(['POST'])
 # @permission_classes([IsAuthenticated])

@@ -1,3 +1,4 @@
+# credit_point/views.py
 import random
 import string
 
@@ -7,8 +8,8 @@ from rest_framework.response import Response
 from rest_framework import status, generics
 from rest_framework.views import APIView
 
-from .serializer import CreditPointSerializer, CreditPointRequestSerializer  
-from .models import CreditPoint,  CreditPointRequest
+from .serializer import CreditPointSerializer, CreditPointRequestSerializer, CreditPointPaymentSerializer, CreditPointEarningSerializer
+from .models import CreditPoint,  CreditPointRequest, CreditPointPayment, CreditPointEarning
 
 from django.contrib.auth import get_user_model
 
@@ -18,7 +19,7 @@ User = get_user_model()
 def generate_credit_point_request_ref():
     letters_and_digits = string.ascii_uppercase + string.digits
     return 'CPR'+''.join(random.choices(letters_and_digits, k=7))
-
+ 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])  
@@ -31,6 +32,7 @@ def credit_point_request_view(request):
 
     try:
         credit_point_amount = request.data.get('credit_point_amount')
+        print('credit_point_amount:', credit_point_amount)
         account_name = request.data.get('account_name')
         account_number = request.data.get('account_number')
         bank_name = request.data.get('bank_name')
@@ -56,27 +58,6 @@ def credit_point_request_view(request):
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
-    # serializer = CreditPointRequestSerializer(credit_point_request)
-
-    
-
-    # return Response({'payment': serializer.data,}, status=status.HTTP_201_CREATED)
-    
-    
-
-    # serializer = CreditPointRequestSerializer(data=data)
-    # if serializer.is_valid():
-    #     serializer.save()
-
-    #     credit_point, created = CreditPoint.objects.get_or_create(user=user)
-    #     balance = credit_point.balance
-    #     credit_point.balance = 0
-    #     credit_point.save()
-
-    #     return Response({'success': f'Credit point request submitted successfully. Withdrew NGN {balance}'})
-    #     # return Response({"message": f"Withdrew NGN {balance}"})
-    # return Response(serializer.errors, status=400)
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -113,11 +94,40 @@ def get_credit_points_balance_view(request):
         return Response({'detail': 'Credit point balance not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
-# @api_view(["POST"])
-# @permission_classes([IsAuthenticated])
-# def withdraw_credit_points(request):
-#     credit_point, created = CreditPoint.objects.get_or_create(user=request.user)
-#     balance = credit_point.balance
-#     credit_point.balance = 0
-#     credit_point.save()
-#     return Response({"message": f"Withdrew NGN {balance}"})
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_user_credit_point_earnings(request):
+    user = request.user
+    try:
+        # user_credit_point_earnings = CreditPointEarning.objects.filter(user=user).order_by('-created_at')
+        user_credit_point_earnings = CreditPointEarning.objects.filter(user=user).order_by('-created_at').select_related('user', 'order_payment')
+        # print('user_credit_point_earnings:', user_credit_point_earnings)
+        serializer = CreditPointEarningSerializer(user_credit_point_earnings, many=True)
+        # print('user_credit_point_earnings serializer:',serializer)
+        return Response(serializer.data)
+    except CreditPointEarning.DoesNotExist:
+        return Response({'detail': 'Credit point earnings not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_credit_point_payments(request):
+    user = request.user
+    try:
+        credit_point_payments = CreditPointPayment.objects.filter(referrer=user).order_by('-created_at')
+        serializer = CreditPointPaymentSerializer(credit_point_payments, many=True)
+        return Response(serializer.data)
+    except CreditPointPayment.DoesNotExist:
+        return Response({'detail': 'Credit point payments not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+# @permission_classes([IsAdminUser]) 
+@permission_classes([IsAuthenticated])
+def get_all_credit_point_payments(request):
+    try:
+        all_credit_points_payments = CreditPointPayment.objects.all().order_by('-created_at')
+        serializer = CreditPointPaymentSerializer(all_credit_points_payments, many=True)
+        return Response(serializer.data)
+    except CreditPointPayment.DoesNotExist:
+        return Response({'detail': 'Credit point payments not found'}, status=status.HTTP_404_NOT_FOUND)
