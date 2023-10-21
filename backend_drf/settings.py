@@ -134,7 +134,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",  # Adding third-part corsheaders middleware
     'django.middleware.common.CommonMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # whitenoise middleware added
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',  # whitenoise middleware added
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -195,7 +195,7 @@ DATABASES = {
         # 'NAME': BASE_DIR / 'db.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3')
     }
-}
+} 
 
 # DATABASES = {
 #      'default': {
@@ -207,7 +207,7 @@ DATABASES = {
 #         'PORT': int(os.getenv('DB_PORT')),
 #      }
 # }
-
+ 
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
@@ -235,18 +235,19 @@ DATABASES = {
 #     },
 # }
 
+"""
 # AWS RDS (prod)
-# Using .env
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': os.getenv('DB_NAME'),
-#         'USER': os.getenv('DB_USER'),
-#         'PASSWORD': os.getenv('DB_PASSWORD'),
-#         'HOST': os.getenv('DB_HOST'),
-#         'PORT': int(os.getenv('DB_PORT')),
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'), 
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': int(os.getenv('DB_PORT')),
+    }
+}
+"""
 
 # For AWS Secret Manager
 # DATABASES = {
