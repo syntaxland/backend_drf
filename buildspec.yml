@@ -9,7 +9,7 @@ version: 0.1
   #   STREAM_INCOMING_PRIVATE_KEY: changeme
   #   STREAM_INCOMING_PUBLIC_KEY: changeme
   #   GOOGLE_API_KEY: changeme
-  #   OPBEAT_ENABLED: False
+  #   OPBEAT_ENABLED: False 
 
 phases:
   pre_build:
