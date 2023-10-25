@@ -191,27 +191,27 @@ CHANNEL_LAYERS = {
 
 
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         # 'NAME': BASE_DIR / 'db.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3')
-#     } 
-# } 
-
-
-
-# AWS RDS (prod)
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'), 
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': int(os.getenv('DB_PORT')),
-    }
-}
+        'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3')
+    } 
+} 
+
+
+
+# # AWS RDS (prod)
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': os.getenv('DB_NAME'),
+#         'USER': os.getenv('DB_USER'),
+#         'PASSWORD': os.getenv('DB_PASSWORD'), 
+#         'HOST': os.getenv('DB_HOST'),
+#         'PORT': int(os.getenv('DB_PORT')),
+#     }
+# }
 
 
  
@@ -394,6 +394,9 @@ PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY')
 PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')
 PAYSTACK_PAYMENT_URL = os.getenv('PAYSTACK_PAYMENT_URL')
 CALLBACK_URL = os.getenv('CALLBACK_URL')
+
+PAYSOFTER_PUBLIC_KEY = os.getenv('PAYSOFTER_PUBLIC_KEY')
+PAYSOFTER_PAYMENT_URL = os.getenv('PAYSOFTER_PAYMENT_URL')
 
 MCDOFSHOP_URL = os.getenv('MCDOFSHOP_URL')
 

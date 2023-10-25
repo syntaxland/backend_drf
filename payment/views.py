@@ -32,15 +32,19 @@ def generate_payment_reference():
 class PaymentDetailsView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
-        public_key = settings.PAYSTACK_PUBLIC_KEY
+        paystack_public_key = settings.PAYSTACK_PUBLIC_KEY
+        paysofter_public_key = settings.PAYSOFTER_PUBLIC_KEY
+
         # email = request.user.email
         reference = generate_payment_reference()
-        print(public_key, reference)
+        print("paystack_public_key:", paystack_public_key, "paysofter_public_key:", paysofter_public_key, reference)
         # print(public_key, reference, email)
-        return Response({"publicKey": public_key,
-                             "reference": reference,
-                            #  "email": email,
-                             })
+        return Response({
+            "paystackPublicKey": paystack_public_key,
+            "paysofterPublicKey": paysofter_public_key,
+            "reference": reference,
+        #  "email": email,
+            })
     
 
 @api_view(['POST'])
