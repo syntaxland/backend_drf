@@ -222,8 +222,6 @@ DATABASES = {
         'PORT': int(os.getenv('DB_PORT')),
     }
 }
- 
-
 
 # DATABASES = {
 #     'default': {
