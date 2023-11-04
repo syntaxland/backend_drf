@@ -47,34 +47,35 @@ def register_user_view(request):
     data = request.data
     serializer = UserSerializer(data=data)
 
+    email = data.get('email')
+    phone_number = data.get('phone_number')
+
+    try:
+        user_with_email = User.objects.get(email=email)
+        if user_with_email.is_verified:
+            return Response({'detail': 'A user with this email already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+    except User.DoesNotExist:
+        pass
+    
+    try:
+        user_with_phone = User.objects.get(phone_number=phone_number)
+        if user_with_phone.is_verified:
+            return Response({'detail': 'A user with this phone number already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+    except User.DoesNotExist:
+        pass
+
     if serializer.is_valid():
-        email = data.get('email')
-        phone_number = data.get('phone_number')
 
-        try:
-            user_with_email = User.objects.get(email=email)
-            if user_with_email.is_verified:
-                return Response({'detail': 'A user with this email already exists.'}, status=status.HTTP_400_BAD_REQUEST)
-        except User.DoesNotExist:
-            pass
-        
-        try:
-            user_with_phone = User.objects.get(phone_number=phone_number)
-            if user_with_phone.is_verified:
-                return Response({'detail': 'A user with this phone number already exists.'}, status=status.HTTP_400_BAD_REQUEST)
-        except User.DoesNotExist:
-            pass
-
-            # User does not exist, create the user and send verification OTP
-            print('\nCreating user...')
-            user = User.objects.create_user(
-                username=email,  # Use email as the username
-                email=email,
-                first_name=data.get('first_name'),
-                last_name=data.get('last_name'),
-                phone_number=data.get('phone_number'),
-                password=data.get('password'),
-            )
+        # User does not exist, create the user and send verification OTP
+        print('\nCreating user...')
+        user = User.objects.create_user(
+            username=email,  # Use email as the username
+            email=email,
+            first_name=data.get('first_name'),
+            last_name=data.get('last_name'),
+            phone_number=data.get('phone_number'),
+            password=data.get('password'),
+        )
 
         # Check if the user has a referral code in the URL
         referral_code = data.get('referral_code')

@@ -74,7 +74,7 @@ def send_email_otp(request):
         except EmailOtp.DoesNotExist:
             return Response({'detail': 'User not found. Please register again.'}, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 
 
 @api_view(['POST'])
