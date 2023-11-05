@@ -30,18 +30,14 @@ def verify_email_otp(request):
                 user_email = email_otp.email
                 try:
                     user = User.objects.get(email=user_email)
-
                     if user.is_verified:
-                        # User is already verified, redirect to login page
                         return Response({'detail': f'User with email: {user_email} already verified. Please login.'}, status=status.HTTP_200_OK)
                     else:
-                        # Verify the user and mark as verified
                         user.is_verified = True
                         user.save()
                         print('Email verified successfully.')
                         return Response({'detail': 'Email verified successfully!'}, status=status.HTTP_200_OK)
                 except User.DoesNotExist:
-                    # User does not exist, redirect to register page
                     return Response({'detail': 'User not found. Please register again.'}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response({'detail': 'Invalid or expired OTP. Please try again.'}, status=status.HTTP_400_BAD_REQUEST)
