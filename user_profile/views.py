@@ -52,9 +52,16 @@ def register_user_view(request):
     phone_number = data.get('phone_number')
 
     try:
-        user_with_email = User.objects.get(username=username)
-        if user_with_email.is_verified:
+        user_with_username = User.objects.get(username=username)
+        if user_with_username.is_verified:
             return Response({'detail': 'A user with this username already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+    except User.DoesNotExist:
+        pass
+
+    try:
+        user_with_email_not_verified = User.objects.get(email=email)
+        if not user_with_email_not_verified.is_verified:
+            return Response({'detail': 'A user with this email already exists but not verified. Login to verify your account.'}, status=status.HTTP_400_BAD_REQUEST)
     except User.DoesNotExist:
         pass
 
@@ -64,7 +71,7 @@ def register_user_view(request):
             return Response({'detail': 'A user with this email already exists.'}, status=status.HTTP_400_BAD_REQUEST)
     except User.DoesNotExist:
         pass
-    
+
     try:
         user_with_phone = User.objects.get(phone_number=phone_number)
         if user_with_phone.is_verified:
@@ -73,8 +80,6 @@ def register_user_view(request):
         pass
 
     if serializer.is_valid():
-
-        # User does not exist, create the user and send verification OTP
         print('\nCreating user...')
         user = User.objects.create_user(
             username=username,  
