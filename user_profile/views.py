@@ -47,8 +47,16 @@ def register_user_view(request):
     data = request.data
     serializer = UserSerializer(data=data)
 
+    username = data.get('username')
     email = data.get('email')
     phone_number = data.get('phone_number')
+
+    try:
+        user_with_email = User.objects.get(username=username)
+        if user_with_email.is_verified:
+            return Response({'detail': 'A user with this username already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+    except User.DoesNotExist:
+        pass
 
     try:
         user_with_email = User.objects.get(email=email)
@@ -69,7 +77,7 @@ def register_user_view(request):
         # User does not exist, create the user and send verification OTP
         print('\nCreating user...')
         user = User.objects.create_user(
-            username=email,  # Use email as the username
+            username=username,  
             email=email,
             first_name=data.get('first_name'),
             last_name=data.get('last_name'),
