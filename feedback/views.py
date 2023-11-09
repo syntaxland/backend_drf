@@ -24,7 +24,7 @@ def create_feedback(request):
     print('category:', category, 'subject:', subject)
     
     Feedback.objects.create(
-            user=user, 
+            user=user,  
             category=category,
             subject=subject,
             message=message,
