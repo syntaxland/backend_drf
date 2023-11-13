@@ -17,6 +17,8 @@ class Payment(models.Model):
     final_total_amount = models.DecimalField(max_digits=16, decimal_places=2, null=True, blank=True)
     reference = models.CharField(max_length=14, unique=True, blank=True) 
     payment_provider = models.CharField(max_length=50, null=True, blank=True) 
+    is_success = models.BooleanField(default=False)
+    is_delivered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
