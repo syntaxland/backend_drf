@@ -1,7 +1,7 @@
 # support/tasks.py
 from celery import shared_task
 
-from support.models import SupportTicket, SupportMessage
+from support.models import SupportTicket, SupportResponse
 
 import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
@@ -24,8 +24,8 @@ def check_support_is_expired():
         # threshold_date = timezone.now() - timedelta(days=7) 
         threshold_date = timezone.now() - timedelta(seconds=30) 
 
-        # Subquery to get the last SupportMessage creation date for each SupportTicket
-        last_support_message_created = SupportMessage.objects.filter(
+        # Subquery to get the last SupportResponse creation date for each SupportTicket
+        last_support_message_created = SupportResponse.objects.filter(
             support_ticket=OuterRef('pk')
         ).order_by('-created_at').values('created_at')[:1]
 
@@ -35,7 +35,7 @@ def check_support_is_expired():
         #     support_user__support_ticket__created_at__lte=threshold_date,  # Older than 7 days
         # ).distinct()  
 
-        # Get users whose last SupportMessage creation date is lte threshold_date
+        # Get users whose last SupportResponse creation date is lte threshold_date
         users_with_expired_tickets = User.objects.filter(
             support_user__is_closed=False,  # Open tickets
             support_user__support_ticket__created_at__lte=threshold_date,  # Older than 7 days

@@ -46,19 +46,19 @@ class SupportResponse(models.Model):
     
     def __str__(self):
         return f"{self.support_ticket}"
+ 
 
-
-class SupportMessage(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="support_message_user")
-    # support_ticket = models.ForeignKey(SupportTicket, on_delete=models.CASCADE, related_name='support_ticket', null=True)
-    subject = models.CharField(max_length=225, null=True, blank=True)
-    # category = models.CharField(max_length=225, null=True, blank=True, choices=ROOM_TOPIC)
-    # ticket_id = models.CharField(max_length=12, unique=True, null=True)
-    # is_closed = models.BooleanField(default=False)  
-    # is_resolved = models.BooleanField(default=False)  
-    message = models.TextField(max_length=5000, null=True, blank=True,)
-    modified = models.DateTimeField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, null=True)
+# class SupportMessage(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="support_message_user")
+#     # support_ticket = models.ForeignKey(SupportTicket, on_delete=models.CASCADE, related_name='support_ticket', null=True)
+#     subject = models.CharField(max_length=225, null=True, blank=True)
+#     # category = models.CharField(max_length=225, null=True, blank=True, choices=ROOM_TOPIC)
+#     # ticket_id = models.CharField(max_length=12, unique=True, null=True)
+#     # is_closed = models.BooleanField(default=False)  
+#     # is_resolved = models.BooleanField(default=False)  
+#     message = models.TextField(max_length=5000, null=True, blank=True,)
+#     modified = models.DateTimeField(null=True, blank=True)
+#     created_at = models.DateTimeField(auto_now_add=True, null=True)
     
-    def __str__(self):
-        return f"{self.subject}"
+#     def __str__(self):
+#         return f"{self.subject}"

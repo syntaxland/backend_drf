@@ -1,6 +1,6 @@
 # support/serializers.py
 from rest_framework import serializers
-from .models import SupportTicket, SupportMessage, SupportResponse
+from .models import SupportTicket, SupportResponse
 
 
 class SupportTicketSerializer(serializers.ModelSerializer):
@@ -18,11 +18,4 @@ class SupportResponseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SupportResponse
-        fields = '__all__'
-
-
-class SupportMessageSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = SupportMessage
         fields = '__all__'
