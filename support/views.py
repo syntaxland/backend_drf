@@ -12,7 +12,7 @@ from .serializers import SupportTicketSerializer, SupportResponseSerializer
 
 from .tasks import check_support_is_expired
 
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404 
 from django.http.response import HttpResponse
 from django.utils import timezone
 from datetime import timedelta
@@ -124,23 +124,6 @@ def list_support_ticket(request):
         return Response(serializer.data)
     except SupportTicket.DoesNotExist:
         return Response({'detail': 'Support ticket not found'}, status=status.HTTP_404_NOT_FOUND)
-    
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_ticket_detail(request, ticket_id):
-    user=request.user
-    print('ticket_id:', ticket_id)
-    try:
-        support_ticket = SupportTicket.objects.filter(
-            # user=user, 
-            ticket_id=ticket_id,
-            ).order_by('-created_at')
-        serializer = SupportTicketSerializer(support_ticket, many=True)
-        return Response(serializer.data)
-    except SupportTicket.DoesNotExist:
-        return Response({'detail': 'Support ticket not found'}, status=status.HTTP_404_NOT_FOUND)
-
 
 
 @api_view(['GET'])
@@ -194,3 +177,19 @@ def trigger_check_support_is_expired(request):
         result = check_support_is_expired.delay()
         return HttpResponse({'task_id': result.id})
     return HttpResponse({'message': 'Invalid request method'})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_ticket_detail(request, ticket_id):
+    user=request.user
+    print('ticket_id:', ticket_id)
+    try:
+        support_ticket = SupportTicket.objects.filter(
+            # user=user, 
+            ticket_id=ticket_id,
+            ).order_by('-created_at')
+        serializer = SupportTicketSerializer(support_ticket, many=True)
+        return Response(serializer.data)
+    except SupportTicket.DoesNotExist:
+        return Response({'detail': 'Support ticket not found'}, status=status.HTTP_404_NOT_FOUND)

@@ -8,7 +8,7 @@ User = get_user_model()
 ROOM_TOPIC = (
         ('support', 'Support'),
         ('billing', 'Billing'),
-        ('abuse', 'Abuse'),
+        ('abuse', 'Abuse'), 
         ('otp', 'OTP'),
         ('payments', 'Payments'),
         ('transactions', 'Transactions'), 
