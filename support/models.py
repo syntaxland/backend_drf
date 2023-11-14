@@ -41,7 +41,7 @@ class SupportResponse(models.Model):
     support_ticket = models.ForeignKey(SupportTicket, on_delete=models.CASCADE, related_name='support_response', blank=True, null=True)
     message = models.TextField(max_length=5000, null=True, blank=True,)
     rating = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
-    # modified = models.DateTimeField(null=True, blank=True)
+    modified = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     
     def __str__(self):
