@@ -4,6 +4,7 @@ sed -i 's/\[]/\["54.159.74.226"]/' /home/ubuntu/backend_drf/backend_drf/settings
 
 python manage.py migrate 
 python manage.py makemigrations  
+python manage.py migrate 
 python manage.py collectstatic
 sudo service gunicorn restart
 sudo service nginx restart 
