@@ -33,7 +33,7 @@ def create_promo_code(request):
 
 
 @api_view(['POST', 'GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated]) 
 def apply_promo_code(request):
     data = request.data
     promo_code = data.get('promoCode')
