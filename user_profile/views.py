@@ -54,7 +54,7 @@ def register_user_view(request):
     try:
         user_with_username = User.objects.get(username=username)
         if user_with_username.is_verified:
-            return Response({'detail': 'A user with this username already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'A user with this username already exists.'}, status=status.HTTP_400_BAD_REQUEST) 
     except User.DoesNotExist:
         pass
 
