@@ -11,7 +11,11 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'password', 'phone_number', 'is_verified', 'is_superuser', 'created_at']
+        fields = ['id', 'username', 'email', 'first_name', 
+                  'last_name', 'password', 'phone_number', 
+                  'is_verified', 'is_superuser', 'is_staff', 
+                  'is_ecommerce_seller', 'is_marketplace_seller', 'created_at'
+                  ]
         extra_kwargs = {
             'password': {'write_only': True},
         }
@@ -115,7 +119,7 @@ class AvatarUpdateSerializer(serializers.ModelSerializer):
         fields = ('avatar',)
 
 
-class ChangePasswordSerializer(serializers.Serializer):
+class ChangePasswordSerializer(serializers.Serializer): 
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
 

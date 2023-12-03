@@ -36,6 +36,8 @@ urlpatterns = [
     path('api/', include('live_chat.urls')),
     path('', include('live_chat.urls')),
     path('api/', include('sellers.urls')),
+    path('api/', include('marketplace.urls')),
+    # path('api/', include('ecommerce.urls')),
     path('api/', include('promo.urls')),
     path('api/', include('support.urls')),
     path('api/', include('feedback.urls')),

@@ -52,7 +52,7 @@ def register_user_view(request):
     phone_number = data.get('phone_number')
 
     try:
-        user_with_username = User.objects.get(username=username)
+        user_with_username = User.objects.get(username=username) 
         if user_with_username.is_verified:
             return Response({'detail': 'A user with this username already exists.'}, status=status.HTTP_400_BAD_REQUEST) 
     except User.DoesNotExist:
@@ -88,6 +88,7 @@ def register_user_view(request):
             last_name=data.get('last_name'),
             phone_number=data.get('phone_number'),
             password=data.get('password'),
+            is_terms_conditions_read=data.get('is_terms_conditions_read'),
         )
 
         # Check if the user has a referral code in the URL

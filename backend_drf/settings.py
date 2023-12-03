@@ -78,6 +78,8 @@ INSTALLED_APPS = [
     'sellers',
     'support',
     'feedback',
+    'marketplace',
+    # 'ecommerce', 
     # 'products',
 
     # Third-party apps

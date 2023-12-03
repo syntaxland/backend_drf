@@ -50,7 +50,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     # referred_users = models.ManyToManyField('promo.Referral', related_name='referred_users')   
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)  
-    created_at = models.DateTimeField(default=timezone.now, blank=True)
+    is_marketplace_seller = models.BooleanField(default=False)  
+    is_ecommerce_seller = models.BooleanField(default=False)  
+    is_terms_conditions_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=timezone.now, blank=True) 
   
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'phone_number']
