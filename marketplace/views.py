@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, parser_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 
@@ -252,7 +252,7 @@ def update_marketplace_seller_photo(request):
 @parser_classes([MultiPartParser, FormParser])
 def get_seller_free_ad(request):
     user = request.user
-    current_datetime = timezone.now()
+    current_datetime = datetime.now()
     try:
         free_ad = PostFreeAd.objects.filter(seller=user, expiration_date__gt=current_datetime)
         serializer = PostFreeAdSerializer(free_ad, many=True)
@@ -262,16 +262,15 @@ def get_seller_free_ad(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 @parser_classes([MultiPartParser, FormParser])
-def get_all_free_ad(request):
-    current_datetime = timezone.now()
+def get_free_ad_detail(request, pk):
     try:
-        free_ad = PostFreeAd.objects.filter(expiration_date__gt=current_datetime)
-        serializer = PostFreeAdSerializer(free_ad, many=True)
+        ad = PostFreeAd.objects.get(id=pk)
+        serializer = PostFreeAdSerializer(ad, many=False)
         return Response(serializer.data)
     except PostFreeAd.DoesNotExist:
-        return Response({'detail': 'Free ad not found'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['PUT'])
@@ -290,3 +289,97 @@ def update_seller_free_ad(request, pk):
         serializer.save()
         return Response({'detail': 'Free ad updated successfully.'}, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_free_ad(request, pk):
+    user = request.user
+    try:
+        ad = PostFreeAd.objects.get(seller=user, pk=pk)
+        ad.delete()
+        return Response({'detail': 'Ad deleted successfully.'})
+    except PostFreeAd.DoesNotExist:
+        return Response({'detail': 'Ad not found.'}, status=status.HTTP_404_NOT_FOUND)
+    
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+@parser_classes([MultiPartParser, FormParser])
+def get_all_free_ad(request):
+    current_datetime = datetime.now()
+    try:
+        free_ad = PostFreeAd.objects.filter(expiration_date__gt=current_datetime)
+        serializer = PostFreeAdSerializer(free_ad, many=True)
+        return Response(serializer.data)
+    except PostFreeAd.DoesNotExist:
+        return Response({'detail': 'Free ad not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
+def get_seller_paid_ad(request):
+    user = request.user
+    current_datetime = datetime.now()
+    try:
+        paid_ad = PostPaidAd.objects.filter(seller=user, expiration_date__gt=current_datetime)
+        serializer = PostPaidAdSerializer(paid_ad, many=True)
+        return Response(serializer.data)
+    except PostPaidAd.DoesNotExist:
+        return Response({'detail': 'Paid ad not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+@parser_classes([MultiPartParser, FormParser])
+def get_paid_ad_detail(request, pk):
+    try:
+        ad = PostPaidAd.objects.get(id=pk)
+        serializer = PostPaidAdSerializer(ad, many=False)
+        return Response(serializer.data)
+    except PostPaidAd.DoesNotExist:
+        return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
+def update_seller_paid_ad(request, pk):
+    user = request.user
+    data = request.data
+    print('data:', data)
+    try:
+        paid_ad = PostPaidAd.objects.get(seller=user, pk=pk)
+    except PostPaidAd.DoesNotExist:
+        return Response({'detail': 'Paid ad not found'}, status=status.HTTP_404_NOT_FOUND)
+    serializer = PostPaidAdSerializer(paid_ad, data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({'detail': 'Paid ad updated successfully.'}, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_paid_ad(request, pk):
+    user = request.user
+    try:
+        ad = PostPaidAd.objects.get(seller=user, pk=pk)
+        ad.delete()
+        return Response({'detail': 'Ad deleted successfully.'})
+    except PostPaidAd.DoesNotExist:
+        return Response({'detail': 'Ad not found.'}, status=status.HTTP_404_NOT_FOUND)
+    
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+@parser_classes([MultiPartParser, FormParser])
+def get_all_paid_ad(request):
+    current_datetime = datetime.now()
+    try:
+        paid_ad = PostPaidAd.objects.filter(expiration_date__gt=current_datetime)
+        serializer = PostPaidAdSerializer(paid_ad, many=True)
+        return Response(serializer.data)
+    except PostPaidAd.DoesNotExist:
+        return Response({'detail': 'Paid ad not found'}, status=status.HTTP_404_NOT_FOUND)
