@@ -208,7 +208,7 @@ def update_marketplace_seller_account(request):
     try:
         marketplace_seller_account = MarketPlaceSellerAccount.objects.get(seller=user)
     except MarketPlaceSellerAccount.DoesNotExist:
-        return Response({'detail': 'Business status not found'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'detail': 'Marketplace seller account not found'}, status=status.HTTP_404_NOT_FOUND)
     serializer = MarketPlaceSellerAccountSerializer(marketplace_seller_account, data, partial=True)
     if serializer.is_valid():
         serializer.save()
@@ -222,10 +222,10 @@ def update_marketplace_seller_account(request):
 def get_marketplace_seller_photo(request):
     user = request.user
     try:
-        marketplace_seller_photo = MarketPlaceSellerAccount.objects.get(seller=user)
-        serializer = MarketPlaceSellerAccountSerializer(marketplace_seller_photo)
+        marketplace_seller_photo = MarketplaceSellerPhoto.objects.get(seller=user)
+        serializer = MarketplaceSellerPhotoSerializer(marketplace_seller_photo)
         return Response(serializer.data)
-    except MarketPlaceSellerAccount.DoesNotExist:
+    except MarketplaceSellerPhoto.DoesNotExist:
         return Response({'detail': 'Marketplace seller photo not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
@@ -237,10 +237,10 @@ def update_marketplace_seller_photo(request):
     data = request.data
     print('data:', data)
     try:
-        marketplace_seller_photo = MarketPlaceSellerAccount.objects.get(seller=user)
-    except MarketPlaceSellerAccount.DoesNotExist:
+        marketplace_seller_photo = MarketplaceSellerPhoto.objects.get(seller=user)
+    except MarketplaceSellerPhoto.DoesNotExist:
         return Response({'detail': 'Marketplace seller photo not found'}, status=status.HTTP_404_NOT_FOUND)
-    serializer = MarketPlaceSellerAccountSerializer(marketplace_seller_photo, data, partial=True)
+    serializer = MarketplaceSellerPhotoSerializer(marketplace_seller_photo, data, partial=True)
     if serializer.is_valid():
         serializer.save()
         return Response({'detail': 'Marketplace seller photo updated successfully.'}, status=status.HTTP_200_OK)

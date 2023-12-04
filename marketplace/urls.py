@@ -16,7 +16,10 @@ urlpatterns = [
 
     path('get-seller-free-ad/', views.get_seller_free_ad, name='get-seller-free-ad'),
     path('update-seller-free-ad/<int:pk>/', views.update_seller_free_ad, name='update-seller-free-ad'),
-
     path('get-all-free-ad/', views.get_all_free_ad, name='get-all-free-ad'),
+
+    # path('get-seller-paid-ad/', views.get_seller_paid_ad, name='get-seller-paid-ad'),
+    # path('update-seller-paid-ad/<int:pk>/', views.update_seller_paid_ad, name='update-seller-paid-ad'),
+    # path('get-all-paid-ad/', views.get_all_paid_ad, name='get-all-paid-ad'),
 
 ]

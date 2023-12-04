@@ -219,6 +219,7 @@ class MarketPlaceSellerAccount(models.Model):
     business_name = models.CharField(max_length=100, null=True)
     business_status = models.CharField(max_length=225, null=True, choices=BUSINESS_TYPE_CHOICES)
     business_reg_num = models.CharField(max_length=50, null=True, blank=True)
+    business_reg_cert = models.ImageField(upload_to='media/sellers/', null=True, blank=True)
     business_address = models.CharField(max_length=225, null=True)
     staff_size = models.CharField( max_length=50, null=True, choices=STAFF_SIZE_CHOICES)
     business_industry = models.CharField( max_length=50, null=True, choices=BUSINESS_INDUSTRY_CHOICES)    
