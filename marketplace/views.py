@@ -259,7 +259,7 @@ def get_seller_free_ad(request):
         return Response(serializer.data)
     except PostFreeAd.DoesNotExist:
         return Response({'detail': 'Free ad not found'}, status=status.HTTP_404_NOT_FOUND)
-
+ 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
