@@ -27,4 +27,7 @@ urlpatterns = [
     path('delete-paid-ad/<int:pk>/', views.delete_paid_ad, name='delete-paid-ad'),
     path('get-all-paid-ad/', views.get_all_paid_ad, name='get-all-paid-ad'),
 
+    path('get-seller-api-key/', views.get_seller_paysofter_api_key, name='get-seller-api-key'),
+    path('save-seller-api-key/', views.save_seller_paysofter_api_key, name='save-seller-api-key'),
+
 ]

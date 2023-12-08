@@ -9,8 +9,8 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 
 from credit_point.models import CreditPoint
-from .models import MarketPlaceSellerAccount, MarketplaceSellerPhoto, PostFreeAd, PostPaidAd
-from .serializers import MarketPlaceSellerAccountSerializer, MarketplaceSellerPhotoSerializer, PostFreeAdSerializer, PostPaidAdSerializer
+from .models import MarketPlaceSellerAccount, MarketplaceSellerPhoto, PostFreeAd, PostPaidAd, PaysofterApiKey
+from .serializers import MarketPlaceSellerAccountSerializer, MarketplaceSellerPhotoSerializer, PostFreeAdSerializer, PostPaidAdSerializer, PaysofterApiKeySerializer
 
 from django.contrib.auth import get_user_model
 
@@ -261,14 +261,33 @@ def get_seller_free_ad(request):
         return Response({'detail': 'Free ad not found'}, status=status.HTTP_404_NOT_FOUND)
  
 
+# @api_view(['GET'])
+# @permission_classes([AllowAny])
+# @parser_classes([MultiPartParser, FormParser])
+# def get_free_ad_detail(request, pk):
+#     try:
+#         ad = PostFreeAd.objects.get(id=pk)
+#         serializer = PostFreeAdSerializer(ad, many=False)
+#         return Response(serializer.data)
+#     except PostFreeAd.DoesNotExist:
+#         return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 @parser_classes([MultiPartParser, FormParser])
 def get_free_ad_detail(request, pk):
+    seller_api_key = None  
+
     try:
         ad = PostFreeAd.objects.get(id=pk)
-        serializer = PostFreeAdSerializer(ad, many=False)
-        return Response(serializer.data)
+        seller = ad.seller
+        
+        api_key = PaysofterApiKey.objects.get(seller=seller)
+        seller_api_key = api_key.live_api_key
+
+        serializer = PostFreeAdSerializer(ad)
+        return Response({'data': serializer.data, 'sellerApiKey': seller_api_key}, status=status.HTTP_200_OK)
     except PostFreeAd.DoesNotExist:
         return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -334,10 +353,17 @@ def get_seller_paid_ad(request):
 @permission_classes([AllowAny])
 @parser_classes([MultiPartParser, FormParser])
 def get_paid_ad_detail(request, pk):
+    seller_api_key = None  
+
     try:
         ad = PostPaidAd.objects.get(id=pk)
-        serializer = PostPaidAdSerializer(ad, many=False)
-        return Response(serializer.data)
+        seller = ad.seller
+
+        api_key = PaysofterApiKey.objects.get(seller=seller)
+        seller_api_key = api_key.live_api_key
+
+        serializer = PostPaidAdSerializer(ad)
+        return Response({'data': serializer.data, 'sellerApiKey': seller_api_key}, status=status.HTTP_200_OK)
     except PostPaidAd.DoesNotExist:
         return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -383,3 +409,33 @@ def get_all_paid_ad(request):
         return Response(serializer.data)
     except PostPaidAd.DoesNotExist:
         return Response({'detail': 'Paid ad not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
+def save_seller_paysofter_api_key(request):
+    user = request.user
+    data = request.data
+    print('data:', data)
+    try:
+        api_key = PaysofterApiKey.objects.get(seller=user)
+    except PaysofterApiKey.DoesNotExist:
+        return Response({'detail': 'Api key not found'}, status=status.HTTP_404_NOT_FOUND)
+    serializer = PaysofterApiKeySerializer(api_key, data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({'detail': 'Api key updated successfully.'}, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_seller_paysofter_api_key(request):
+    user = request.user
+    try:
+        api_key = PaysofterApiKey.objects.get(seller=user)
+        serializer = PaysofterApiKeySerializer(api_key)
+        return Response(serializer.data)
+    except PaysofterApiKey.DoesNotExist:
+        return Response({'detail': 'Api key not found'}, status=status.HTTP_404_NOT_FOUND)

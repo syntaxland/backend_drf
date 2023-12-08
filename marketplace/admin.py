@@ -69,3 +69,12 @@ class AuthorAdmin(admin.ModelAdmin):
         'duration_hours',
         'expiration_date',
     )  
+
+
+@admin.register(models.PaysofterApiKey)
+class AuthorAdmin(admin.ModelAdmin):
+    list_display = (
+        # 'created_at',
+        'seller',
+        'live_api_key',
+    )  

@@ -323,9 +323,10 @@ class PostPaidAd(models.Model):
     price = models.DecimalField(max_digits=16, decimal_places=2, null=True)
     promo_price = models.DecimalField(max_digits=16, decimal_places=2, null=True, blank=True)    
     brand = models.CharField(max_length=255, blank=True, null=True) 
+    promo_code = models.ForeignKey('promo.PromoCode', on_delete=models.SET_NULL, null=True, blank=True)
+    discount_percentage = models.DecimalField(max_digits=5, decimal_places=1, default=0) 
     description = models.TextField(max_length=450, blank=True, null=True)
     youtube_link = models.URLField(max_length=255, blank=True, null=True)
-    promo_code = models.ForeignKey('promo.PromoCode', on_delete=models.SET_NULL, null=True, blank=True)
     ad_charges = models.DecimalField(max_digits=16, decimal_places=2, default=0)
     is_price_negotiable = models.BooleanField(default=False)
     phone_view_count = models.PositiveIntegerField(default=0, editable=False)
@@ -372,3 +373,8 @@ class PostPaidAd(models.Model):
         return self.ad_name
 
    
+class PaysofterApiKey(models.Model):
+    seller = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="paysofter_seller") 
+    live_api_key = models.CharField(max_length=100, null=True, blank=True)
+    is_api_key_live = models.BooleanField(default=False)
+    # created_at = models.DateTimeField(auto_now_add=True, null=True)

@@ -10,7 +10,7 @@ User = get_user_model()
 
 class PromoCode(models.Model):
     promo_code = models.CharField(max_length=20, unique=True)
-    discount_percentage = models.DecimalField(max_digits=5, decimal_places=1) 
+    discount_percentage = models.DecimalField(max_digits=5, decimal_places=1)   
     expiration_date = models.DateTimeField()
     created_at = models.DateTimeField(default=timezone.now)
 
