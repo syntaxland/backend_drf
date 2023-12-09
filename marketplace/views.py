@@ -447,10 +447,12 @@ def save_seller_paysofter_api_key(request):
     user = request.user
     data = request.data
     print('data:', data)
-    try:
-        api_key = PaysofterApiKey.objects.get(seller=user)
-    except PaysofterApiKey.DoesNotExist:
-        return Response({'detail': 'Api key not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    api_key, created = PaysofterApiKey.objects.get_or_create(seller=request.user)
+    # try:
+    #     api_key = PaysofterApiKey.objects.get(seller=user)
+    # except PaysofterApiKey.DoesNotExist:
+    #     return Response({'detail': 'Api key not found'}, status=status.HTTP_404_NOT_FOUND)
     serializer = PaysofterApiKeySerializer(api_key, data, partial=True)
     if serializer.is_valid():
         serializer.save()
