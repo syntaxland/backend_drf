@@ -283,18 +283,31 @@ def get_free_ad_detail(request, pk):
         ad = PostFreeAd.objects.get(id=pk)
         seller = ad.seller
         
-        api_key = PaysofterApiKey.objects.get(seller=seller)
-        seller_api_key = api_key.live_api_key
+        try:
+            api_key = PaysofterApiKey.objects.get(seller=seller)
+            seller_api_key = api_key.live_api_key
+        except PaysofterApiKey.DoesNotExist:
+            seller_api_key = None
+            # return Response({'detail': 'PaysofterApiKey not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        seller_avatar = MarketplaceSellerPhoto.objects.get(seller=seller)
-        seller_avatar_url = seller_avatar.photo.url
+        try:
+            seller_avatar = MarketplaceSellerPhoto.objects.get(seller=seller)
+            seller_avatar_url = seller_avatar.photo.url
+        except MarketplaceSellerPhoto.DoesNotExist:
+            seller_avatar_url = None
+            # return Response({'detail': 'MarketplaceSellerPhoto not found'}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = PostPaidAdSerializer(ad, context={'seller_avatar_url': seller_avatar_url})
 
         serializer = PostFreeAdSerializer(ad)
-        return Response({'data': serializer.data, 'sellerApiKey': seller_api_key, 'seller_avatar_url': seller_avatar_url}, status=status.HTTP_200_OK)
+        return Response({'data': serializer.data, 'sellerApiKey': seller_api_key,
+                          'seller_avatar_url': seller_avatar_url}, status=status.HTTP_200_OK)
     except PostFreeAd.DoesNotExist:
         return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
+    except PaysofterApiKey.DoesNotExist:
+        return Response({'detail': 'PaysofterApiKey not found'}, status=status.HTTP_404_NOT_FOUND)
+    except MarketplaceSellerPhoto.DoesNotExist:
+        return Response({'detail': 'MarketplaceSellerPhoto not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['PUT'])
@@ -352,25 +365,6 @@ def get_seller_paid_ad(request):
         return Response(serializer.data)
     except PostPaidAd.DoesNotExist:
         return Response({'detail': 'Paid ad not found'}, status=status.HTTP_404_NOT_FOUND)
-    
-
-# @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-# @parser_classes([MultiPartParser, FormParser])
-# def get_paid_ad_detail(request, pk):
-#     seller_api_key = None  
-
-#     try:
-#         ad = PostPaidAd.objects.get(id=pk)
-#         seller = ad.seller
-
-#         api_key = PaysofterApiKey.objects.get(seller=seller)
-#         seller_api_key = api_key.live_api_key
-
-#         serializer = PostPaidAdSerializer(ad)
-#         return Response({'data': serializer.data, 'sellerApiKey': seller_api_key}, status=status.HTTP_200_OK)
-#     except PostPaidAd.DoesNotExist:
-#         return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
@@ -383,18 +377,29 @@ def get_paid_ad_detail(request, pk):
         ad = PostPaidAd.objects.get(id=pk)
         seller = ad.seller
 
-        api_key = PaysofterApiKey.objects.get(seller=seller)
-        seller_api_key = api_key.live_api_key
+        try:
+            api_key = PaysofterApiKey.objects.get(seller=seller)
+            seller_api_key = api_key.live_api_key
+        except PaysofterApiKey.DoesNotExist:
+            seller_api_key = None
+            # return Response({'detail': 'PaysofterApiKey not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        seller_avatar = MarketplaceSellerPhoto.objects.get(seller=seller)
-        # seller_avatar = seller.photo_seller
-        seller_avatar_url = seller_avatar.photo.url
+        try:
+            seller_avatar = MarketplaceSellerPhoto.objects.get(seller=seller)
+            seller_avatar_url = seller_avatar.photo.url
+        except MarketplaceSellerPhoto.DoesNotExist:
+            seller_avatar_url = None
+            # return Response({'detail': 'MarketplaceSellerPhoto not found'}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = PostPaidAdSerializer(ad, context={'seller_avatar_url': seller_avatar_url})
 
-        return Response({'data': serializer.data, 'sellerApiKey': seller_api_key, 'seller_avatar_url': seller_avatar_url}, status=status.HTTP_200_OK)
+        return Response({'data': serializer.data, 'sellerApiKey': seller_api_key, 
+                         'seller_avatar_url': seller_avatar_url}, 
+                        status=status.HTTP_200_OK)
     except PostPaidAd.DoesNotExist:
         return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    
 
 
 @api_view(['PUT'])
