@@ -274,7 +274,7 @@ def get_seller_free_ad(request):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
 def get_free_ad_detail(request, pk):
     seller_api_key = None  
@@ -286,8 +286,13 @@ def get_free_ad_detail(request, pk):
         api_key = PaysofterApiKey.objects.get(seller=seller)
         seller_api_key = api_key.live_api_key
 
+        seller_avatar = MarketplaceSellerPhoto.objects.get(seller=seller)
+        seller_avatar_url = seller_avatar.photo.url
+
+        serializer = PostPaidAdSerializer(ad, context={'seller_avatar_url': seller_avatar_url})
+
         serializer = PostFreeAdSerializer(ad)
-        return Response({'data': serializer.data, 'sellerApiKey': seller_api_key}, status=status.HTTP_200_OK)
+        return Response({'data': serializer.data, 'sellerApiKey': seller_api_key, 'seller_avatar_url': seller_avatar_url}, status=status.HTTP_200_OK)
     except PostFreeAd.DoesNotExist:
         return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -328,7 +333,7 @@ def delete_free_ad(request, pk):
 def get_all_free_ad(request):
     current_datetime = datetime.now()
     try:
-        free_ad = PostFreeAd.objects.filter(expiration_date__gt=current_datetime)
+        free_ad = PostFreeAd.objects.filter(expiration_date__gt=current_datetime).order_by("?")
         serializer = PostFreeAdSerializer(free_ad, many=True)
         return Response(serializer.data)
     except PostFreeAd.DoesNotExist:
@@ -349,8 +354,27 @@ def get_seller_paid_ad(request):
         return Response({'detail': 'Paid ad not found'}, status=status.HTTP_404_NOT_FOUND)
     
 
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+# @parser_classes([MultiPartParser, FormParser])
+# def get_paid_ad_detail(request, pk):
+#     seller_api_key = None  
+
+#     try:
+#         ad = PostPaidAd.objects.get(id=pk)
+#         seller = ad.seller
+
+#         api_key = PaysofterApiKey.objects.get(seller=seller)
+#         seller_api_key = api_key.live_api_key
+
+#         serializer = PostPaidAdSerializer(ad)
+#         return Response({'data': serializer.data, 'sellerApiKey': seller_api_key}, status=status.HTTP_200_OK)
+#     except PostPaidAd.DoesNotExist:
+#         return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
 def get_paid_ad_detail(request, pk):
     seller_api_key = None  
@@ -362,8 +386,13 @@ def get_paid_ad_detail(request, pk):
         api_key = PaysofterApiKey.objects.get(seller=seller)
         seller_api_key = api_key.live_api_key
 
-        serializer = PostPaidAdSerializer(ad)
-        return Response({'data': serializer.data, 'sellerApiKey': seller_api_key}, status=status.HTTP_200_OK)
+        seller_avatar = MarketplaceSellerPhoto.objects.get(seller=seller)
+        # seller_avatar = seller.photo_seller
+        seller_avatar_url = seller_avatar.photo.url
+
+        serializer = PostPaidAdSerializer(ad, context={'seller_avatar_url': seller_avatar_url})
+
+        return Response({'data': serializer.data, 'sellerApiKey': seller_api_key, 'seller_avatar_url': seller_avatar_url}, status=status.HTTP_200_OK)
     except PostPaidAd.DoesNotExist:
         return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -404,7 +433,7 @@ def delete_paid_ad(request, pk):
 def get_all_paid_ad(request):
     current_datetime = datetime.now()
     try:
-        paid_ad = PostPaidAd.objects.filter(expiration_date__gt=current_datetime)
+        paid_ad = PostPaidAd.objects.filter(expiration_date__gt=current_datetime).order_by("?")
         serializer = PostPaidAdSerializer(paid_ad, many=True)
         return Response(serializer.data)
     except PostPaidAd.DoesNotExist:
