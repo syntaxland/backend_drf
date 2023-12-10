@@ -78,3 +78,14 @@ class AuthorAdmin(admin.ModelAdmin):
         'seller',
         'live_api_key',
     )  
+
+
+@admin.register(models.Message)
+class AuthorAdmin(admin.ModelAdmin):
+    list_display = (
+        'timestamp',
+        'user',
+        'free_ad',
+        'paid_ad',
+        'message',
+    )  

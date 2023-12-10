@@ -30,4 +30,12 @@ urlpatterns = [
     path('get-seller-api-key/', views.get_seller_paysofter_api_key, name='get-seller-api-key'),
     path('save-seller-api-key/', views.save_seller_paysofter_api_key, name='save-seller-api-key'),
 
+    path('create-paid-ad-message/', views.create_paid_ad_message, name='create-paid-ad-message'),
+    path('list-paid-ad-messages/<int:pk>/', views.list_paid_ad_messages, name='list-paid-ad-messages'),
+
+    path('create-free-ad-message/', views.create_free_ad_message, name='create-free-ad-message'),
+    path('list-free-ad-messages/<int:pk>/', views.list_free_ad_messages, name='list-free-ad-messages'),
+
+    
+
 ]

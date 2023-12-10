@@ -380,3 +380,14 @@ class PaysofterApiKey(models.Model):
     live_api_key = models.CharField(max_length=100, null=True, blank=True)
     is_api_key_live = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
+
+
+class Message(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="message_user")
+    free_ad = models.ForeignKey(PostFreeAd, on_delete=models.CASCADE, related_name='free_ad_message', blank=True, null=True)
+    paid_ad = models.ForeignKey(PostPaidAd, on_delete=models.CASCADE, related_name='paid_ad_message', blank=True, null=True)
+    message = models.TextField(max_length=500, null=True, blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True, null=True)
+    
+    def __str__(self):
+        return f"{self.user} | {self.message}"

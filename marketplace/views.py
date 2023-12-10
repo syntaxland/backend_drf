@@ -9,8 +9,16 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 
 from credit_point.models import CreditPoint
-from .models import MarketPlaceSellerAccount, MarketplaceSellerPhoto, PostFreeAd, PostPaidAd, PaysofterApiKey
-from .serializers import MarketPlaceSellerAccountSerializer, MarketplaceSellerPhotoSerializer, PostFreeAdSerializer, PostPaidAdSerializer, PaysofterApiKeySerializer
+from .models import (MarketPlaceSellerAccount, 
+                     MarketplaceSellerPhoto, 
+                     PostFreeAd, PostPaidAd, 
+                     PaysofterApiKey, Message
+                     )
+from .serializers import (MarketPlaceSellerAccountSerializer,
+                           MarketplaceSellerPhotoSerializer,
+                             PostFreeAdSerializer, PostPaidAdSerializer, 
+                             PaysofterApiKeySerializer, MessageSerializer,
+                            )
 
 from django.contrib.auth import get_user_model
 
@@ -475,3 +483,155 @@ def get_seller_paysofter_api_key(request):
         return Response(serializer.data)
     except PaysofterApiKey.DoesNotExist:
         return Response({'detail': 'Api key not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_free_ad_message(request):
+    user=request.user
+    data=request.data
+    print('data:', data, 'user:', user)
+
+    pk = data.get('pk')
+    message = data.get('message')
+    print('pk:', pk)
+    print('message:', message)
+    
+    try:
+        free_ad = PostFreeAd.objects.get(pk=pk)
+    except PostFreeAd.DoesNotExist:
+        return Response({'detail': 'Message not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    Message.objects.create(
+            user=user,
+            message=message,
+            free_ad=free_ad,
+        )
+    return Response({'message': 'Message created'}, status=status.HTTP_201_CREATED)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_free_ad_messages(request, pk):
+    user = request.user
+    # data  = request.data
+    # print('data:', data)
+    print('user:', user)
+
+    try:
+        free_ad = PostFreeAd.objects.get(pk=pk)
+    except PostFreeAd.DoesNotExist:
+        return Response({'detail': 'Message not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    print('free_ad:', free_ad)
+    
+    try:
+        ad_message = Message.objects.filter(
+            user=user,
+            free_ad=free_ad,
+            ).order_by('timestamp')
+        serializer = MessageSerializer(ad_message, many=True) 
+        return Response(serializer.data)
+    except Message.DoesNotExist:
+        return Response({'detail': 'Message not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def create_free_ad_message(request):
+#     user=request.user
+#     data=request.data
+#     print('data:', data, 'user:', user)
+
+#     pk = data.get('pk')
+#     message = data.get('message')
+#     print('pk:', pk)
+#     print('message:', message)
+    
+#     try:
+#         free_ad = PostFreeAd.objects.get(id=pk)
+#     except PostFreeAd.DoesNotExist:
+#         return Response({'detail': 'Message not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+#     Message.objects.create(
+#             user=user,
+#             message=message,
+#             free_ad=free_ad,
+#         )
+#     return Response({'message': 'Message created'}, status=status.HTTP_201_CREATED)
+
+
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+# def list_free_ad_messages(request, pk):
+#     user = request.user
+#     # data  = request.data
+#     # print('data:', data)
+#     print('user:', user)
+
+#     try:
+#         message = PostFreeAd.objects.get(id=pk)
+#     except PostFreeAd.DoesNotExist:
+#         return Response({'detail': 'Message not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+#     print('message:', message)
+    
+#     try:
+#         message = Message.objects.filter(
+#             message=message,
+#             ).order_by('timestamp')
+#         serializer = MessageSerializer(message, many=True)
+#         return Response(serializer.data)
+#     except Message.DoesNotExist:
+#         return Response({'detail': 'Message not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_paid_ad_message(request):
+    user=request.user
+    data=request.data
+    print('data:', data, 'user:', user)
+
+    pk = data.get('pk')
+    message = data.get('message')
+    print('pk:', pk)
+    print('message:', message)
+    
+    try:
+        paid_ad = PostPaidAd.objects.get(pk=pk)
+    except PostPaidAd.DoesNotExist:
+        return Response({'detail': 'Message not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    Message.objects.create(
+            user=user,
+            message=message,
+            paid_ad=paid_ad,
+        )
+    return Response({'message': 'Message created'}, status=status.HTTP_201_CREATED)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_paid_ad_messages(request, pk):
+    user = request.user
+    # data  = request.data
+    # print('data:', data)
+    print('user:', user)
+
+    try:
+        paid_ad = PostPaidAd.objects.get(pk=pk)
+    except PostPaidAd.DoesNotExist:
+        return Response({'detail': 'Message not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    print('paid_ad:', paid_ad)
+    
+    try:
+        ad_message = Message.objects.filter(
+            user=user,
+            paid_ad=paid_ad,
+            ).order_by('timestamp')
+        serializer = MessageSerializer(ad_message, many=True) 
+        return Response(serializer.data)
+    except Message.DoesNotExist:
+        return Response({'detail': 'Message not found'}, status=status.HTTP_404_NOT_FOUND)
