@@ -260,25 +260,14 @@ def update_marketplace_seller_photo(request):
 @parser_classes([MultiPartParser, FormParser])
 def get_seller_free_ad(request):
     user = request.user
-    current_datetime = datetime.now()
+    # current_datetime = datetime.now()
     try:
-        free_ad = PostFreeAd.objects.filter(seller=user, expiration_date__gt=current_datetime)
+        free_ad = PostFreeAd.objects.filter(seller=user) 
+        # free_ad = PostFreeAd.objects.filter(seller=user, expiration_date__gt=current_datetime)
         serializer = PostFreeAdSerializer(free_ad, many=True)
         return Response(serializer.data)
     except PostFreeAd.DoesNotExist:
         return Response({'detail': 'Free ad not found'}, status=status.HTTP_404_NOT_FOUND)
- 
-
-# @api_view(['GET'])
-# @permission_classes([AllowAny])
-# @parser_classes([MultiPartParser, FormParser])
-# def get_free_ad_detail(request, pk):
-#     try:
-#         ad = PostFreeAd.objects.get(id=pk)
-#         serializer = PostFreeAdSerializer(ad, many=False)
-#         return Response(serializer.data)
-#     except PostFreeAd.DoesNotExist:
-#         return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
@@ -334,19 +323,29 @@ def update_seller_free_ad(request, pk):
         serializer.save()
         return Response({'detail': 'Free ad updated successfully.'}, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
-
-@api_view(['DELETE'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def delete_free_ad(request, pk):
+def delete_free_ad(request):
     user = request.user
+    data = request.data
+    print('user:', user)
+    print('data:', data)
+
+    ad_id = data.get('ad_id')
+    keyword = data.get('keyword')
+
+    if keyword != "delete":
+        return Response({'detail': 'Invalid keyword entered.'}, status=status.HTTP_400_BAD_REQUEST) 
+    
     try:
-        ad = PostFreeAd.objects.get(seller=user, pk=pk)
+        ad = PostFreeAd.objects.get(seller=user, id=ad_id)
         ad.delete()
         return Response({'detail': 'Ad deleted successfully.'})
     except PostFreeAd.DoesNotExist:
         return Response({'detail': 'Ad not found.'}, status=status.HTTP_404_NOT_FOUND)
-    
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -366,9 +365,10 @@ def get_all_free_ad(request):
 @parser_classes([MultiPartParser, FormParser])
 def get_seller_paid_ad(request):
     user = request.user
-    current_datetime = datetime.now()
+    # current_datetime = datetime.now()
     try:
-        paid_ad = PostPaidAd.objects.filter(seller=user, expiration_date__gt=current_datetime)
+        paid_ad = PostPaidAd.objects.filter(seller=user)
+        # paid_ad = PostPaidAd.objects.filter(seller=user, expiration_date__gt=current_datetime)
         serializer = PostPaidAdSerializer(paid_ad, many=True)
         return Response(serializer.data)
     except PostPaidAd.DoesNotExist:
@@ -407,8 +407,6 @@ def get_paid_ad_detail(request, pk):
     except PostPaidAd.DoesNotExist:
         return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
     
-    
-
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -428,12 +426,22 @@ def update_seller_paid_ad(request, pk):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['DELETE'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def delete_paid_ad(request, pk):
+def delete_paid_ad(request):
     user = request.user
+    data = request.data
+    print('user:', user)
+    print('data:', data)
+
+    ad_id = data.get('ad_id')
+    keyword = data.get('keyword')
+
+    if keyword != "delete":
+        return Response({'detail': 'Invalid keyword entered.'}, status=status.HTTP_400_BAD_REQUEST) 
+    
     try:
-        ad = PostPaidAd.objects.get(seller=user, pk=pk)
+        ad = PostPaidAd.objects.get(seller=user, id=ad_id)
         ad.delete()
         return Response({'detail': 'Ad deleted successfully.'})
     except PostPaidAd.DoesNotExist:
