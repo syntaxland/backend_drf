@@ -114,7 +114,7 @@ def create_paid_ad(request):
         if credit_point_balance < 24:
             return Response({'detail': f'Your credit point credit point balance of {credit_point_balance} is too low. You need at least 24 cps to place a paid ad.'}, 
                             status=status.HTTP_400_BAD_REQUEST)
-    except User.DoesNotExist:
+    except CreditPoint.DoesNotExist:
         pass
 
     if serializer.is_valid():        
@@ -411,20 +411,111 @@ def get_paid_ad_detail(request, pk):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
-def update_seller_paid_ad(request, pk):
+def update_seller_paid_ad(request):
     user = request.user
     data = request.data
+
+    ad_id = data.get('ad_id')
     print('data:', data)
+
     try:
-        paid_ad = PostPaidAd.objects.get(seller=user, pk=pk)
+        paid_ad = PostPaidAd.objects.get(seller=user, id=ad_id)
     except PostPaidAd.DoesNotExist:
         return Response({'detail': 'Paid ad not found'}, status=status.HTTP_404_NOT_FOUND)
     serializer = PostPaidAdSerializer(paid_ad, data, partial=True)
+
     if serializer.is_valid():
         serializer.save()
         return Response({'detail': 'Paid ad updated successfully.'}, status=status.HTTP_200_OK)
+    
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def deactivate_paid_ad(request):
+    user = request.user
+    data = request.data 
+    print('user:', user)
+    print('data:', data)
+
+    ad_id = data.get('ad_id')
+    keyword = data.get('keyword')
+
+    if keyword != "deactivate":
+        return Response({'detail': 'Invalid keyword entered.'}, status=status.HTTP_400_BAD_REQUEST) 
+    
+    try:
+        ad = PostPaidAd.objects.get(seller=user, id=ad_id)
+    except PostPaidAd.DoesNotExist:
+        return Response({'detail': 'Ad not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    ad.duration = '0 day'
+
+    try:
+        if ad.duration:
+            durations_mapping = {
+                '0 day': timedelta(hours=0),
+                '1 day': timedelta(hours=24),
+                '2 days': timedelta(days=2),
+                '3 days': timedelta(days=3),
+                '5 days': timedelta(days=5),
+                '1 week': timedelta(weeks=1),
+                '2 weeks': timedelta(weeks=2),
+                '1 month': timedelta(days=30),
+            }
+
+            ad.duration_hours = durations_mapping.get(ad.duration, timedelta(hours=0))
+            ad.expiration_date = datetime.now() + ad.duration_hours
+
+        ad.is_active = False
+        ad.save()
+
+        return Response({'success': f'Ad deactivated successfully.'}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def reactivate_paid_ad(request):
+    user = request.user
+    data = request.data 
+    print('user:', user)
+    print('data:', data)
+
+    ad_id = data.get('ad_id')
+    
+    try:
+        ad = PostPaidAd.objects.get(seller=user, id=ad_id)
+    except PostPaidAd.DoesNotExist:
+        return Response({'detail': 'Ad not found.'}, status=status.HTTP_404_NOT_FOUND)
+    
+    ad.duration = data.get('duration')
+
+    try:
+        if ad.duration:
+            durations_mapping = {
+                '0 day': timedelta(hours=0),
+                '1 day': timedelta(hours=24),
+                '2 days': timedelta(days=2),
+                '3 days': timedelta(days=3),
+                '5 days': timedelta(days=5),
+                '1 week': timedelta(weeks=1),
+                '2 weeks': timedelta(weeks=2),
+                '1 month': timedelta(days=30),
+            }
+
+            ad.duration_hours = durations_mapping.get(ad.duration, timedelta(hours=0))
+            ad.expiration_date = datetime.now() + ad.duration_hours
+
+        ad.is_active = True
+        ad.save()
+
+        return Response({'success': f'Ad reactivated successfully.'}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

@@ -339,6 +339,7 @@ class PostPaidAd(models.Model):
     ad_view_count = models.PositiveIntegerField(default=0, editable=False)
     count_in_stock = models.IntegerField(null=True, blank=True, default=0)
     ad_count = models.PositiveIntegerField(default=0, editable=False)
+    is_auto_renewal = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     image1 = models.ImageField(upload_to='./media/marketplace', null=True, default='./media/default_ad_photo.jpg')
     image2 = models.ImageField(upload_to='./media/marketplace', null=True, blank=True)
