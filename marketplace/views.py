@@ -496,6 +496,17 @@ def reactivate_paid_ad(request):
     print('data:', data)
 
     ad_id = data.get('ad_id')
+
+    try:
+        credit_point = CreditPoint.objects.get(user=user)
+        credit_point_balance = credit_point.balance
+
+        print('credit_point_balance:', credit_point_balance)
+        if credit_point_balance < 24:
+            return Response({'detail': f'Your credit point credit point balance of {credit_point_balance} is too low. You need at least 24 cps to complete this action.'}, 
+                            status=status.HTTP_400_BAD_REQUEST)
+    except CreditPoint.DoesNotExist:
+        pass
     
     try:
         ad = PostPaidAd.objects.get(seller=user, id=ad_id)
