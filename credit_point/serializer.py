@@ -1,6 +1,13 @@
 # credit_point/serializers.py
 from rest_framework import serializers
-from .models import CreditPoint, CreditPointRequest, CreditPointPayment, CreditPointEarning
+from .models import (CreditPoint, 
+                     CreditPointRequest, 
+                     CreditPointPayment, 
+                     CreditPointEarning, 
+                     BuyCreditPoint,
+                       SellCreditPoint
+                     )
+
 from user_profile.serializers import UserSerializer
 from payment.serializers import PaymentSerializer
 from django.contrib.auth import get_user_model
@@ -49,4 +56,20 @@ class CreditPointPaymentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CreditPointPayment
+        fields = "__all__"
+
+
+class BuyCreditPointSerializer(serializers.ModelSerializer):
+    email = serializers.CharField(source='user.email', read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+    class Meta:
+        model = BuyCreditPoint
+        fields = '__all__'
+
+
+class SellCreditPointSerializer(serializers.ModelSerializer):
+    email = serializers.CharField(source='user.email', read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+    class Meta:
+        model = SellCreditPoint
         fields = "__all__"

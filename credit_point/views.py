@@ -1,4 +1,5 @@
 # credit_point/views.py
+from decimal import Decimal
 import random
 import string
 
@@ -8,8 +9,12 @@ from rest_framework.response import Response
 from rest_framework import status, generics
 from rest_framework.views import APIView 
 
-from .serializer import CreditPointSerializer, CreditPointRequestSerializer, CreditPointPaymentSerializer, CreditPointEarningSerializer
-from .models import CreditPoint,  CreditPointRequest, CreditPointPayment, CreditPointEarning
+from .serializer import (CreditPointSerializer, CreditPointRequestSerializer, 
+                         CreditPointPaymentSerializer, CreditPointEarningSerializer,
+                           BuyCreditPointSerializer, SellCreditPointSerializer)
+from .models import (CreditPoint,  CreditPointRequest,
+                      CreditPointPayment, CreditPointEarning, 
+                      BuyCreditPoint, SellCreditPoint)
 
 from django.contrib.auth import get_user_model
 
@@ -19,7 +24,14 @@ User = get_user_model()
 def generate_credit_point_request_ref():
     letters_and_digits = string.ascii_uppercase + string.digits
     return 'CPR'+''.join(random.choices(letters_and_digits, k=7))
- 
+
+def generate_cps_purchase_id():
+    letters_and_digits = string.ascii_uppercase + string.digits
+    return 'CPS'+''.join(random.choices(letters_and_digits, k=7))
+
+def generate_cps_sell_id():
+    letters_and_digits = string.ascii_uppercase + string.digits
+    return 'CPS'+''.join(random.choices(letters_and_digits, k=7))
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])  
@@ -131,3 +143,96 @@ def get_all_credit_point_payments(request):
         return Response(serializer.data)
     except CreditPointPayment.DoesNotExist:
         return Response({'detail': 'Credit point payments not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])  
+def buy_credit_point(request):
+    user = request.user
+    data = request.data
+    print('data:', data)
+
+    cps_purchase_id = generate_cps_purchase_id()
+    print('cps_purchase_id:', cps_purchase_id)
+
+    amount = data.get('amount')
+
+    try:
+        credit_point_request = BuyCreditPoint.objects.create(
+            user=user,
+            amount=amount,
+            cps_purchase_id=cps_purchase_id,
+        )
+
+        credit_point, created = CreditPoint.objects.get_or_create(user=user)
+        balance = credit_point.balance
+        print('cps balance(before):', balance)
+
+        credit_point.balance += amount
+        credit_point.save()
+        print('cps balance(after):', balance)
+
+        credit_point_request.is_success = True
+        credit_point_request.save()
+
+        return Response({'detail': f'Credit point request successful.'}, 
+                        status=status.HTTP_201_CREATED)
+    except CreditPoint.DoesNotExist:
+            return Response({'detail': 'Credit point not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])  
+def sell_credit_point(request):
+    seller = request.user
+    data = request.data
+    print('data:', data)
+
+    cps_sell_id = generate_cps_sell_id()
+    print('cps_sell_id:', cps_sell_id)
+
+    amount = Decimal(data.get('amount'))
+    buyer_username = data.get('username')
+    password = data.get('password')
+
+    if not seller.check_password(password):
+        return Response({'detail': 'Invalid password.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        buyer = User.objects.get(username=buyer_username)
+    except User.DoesNotExist:
+        return Response({'detail': f'CPS Buyer/Receiver with username "{buyer_username}" not found.'}, status=status.HTTP_404_NOT_FOUND)
+    print('buyer:', buyer)
+
+    try:
+        sell_credit_point = SellCreditPoint.objects.create(
+            buyer=buyer,
+            seller=seller,
+            amount=amount,
+            cps_sell_id=cps_sell_id, 
+        )
+
+        seller_credit_point, created = CreditPoint.objects.get_or_create(user=seller)
+        balance = seller_credit_point.balance
+        if balance < amount: 
+            return Response({'detail': 'Insufficient credit point balance. Fund your cps wallet and try again.'}, 
+                            status=status.HTTP_400_BAD_REQUEST)
+        seller_credit_point.balance -= amount
+        seller_credit_point.save()
+
+        buyer_credit_point, created = CreditPoint.objects.get_or_create(user=buyer)
+        balance = buyer_credit_point.balance
+        buyer_credit_point.balance += amount
+        buyer_credit_point.save()
+
+        sell_credit_point.is_success = True
+        sell_credit_point.save()
+
+        return Response({'detail': f'Credit point request successful.'}, 
+                        status=status.HTTP_201_CREATED)
+    except CreditPoint.DoesNotExist:
+            return Response({'detail': 'Credit point not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

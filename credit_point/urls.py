@@ -10,4 +10,7 @@ urlpatterns = [
 
     path('get-user-credit-point-payments/', views.get_user_credit_point_payments, name='get-user-credit-point-payments'),
     path('get-all-credit-point-payments/', views.get_all_credit_point_payments, name='get-all-credit-point-payments'),
+
+    path('sell-credit-point/', views.sell_credit_point, name='sell-credit-point'),
+    path('buy-credit-point/', views.buy_credit_point, name='buy-credit-point'),
 ]
