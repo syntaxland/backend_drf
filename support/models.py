@@ -29,7 +29,6 @@ class SupportTicket(models.Model):
     message = models.TextField(max_length=5000, null=True, blank=True,)
     is_closed = models.BooleanField(default=False)  
     is_resolved = models.BooleanField(default=False)  
-    # modified = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):

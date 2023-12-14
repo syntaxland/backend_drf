@@ -100,15 +100,27 @@ def register_user_view(request):
         try:
             url = settings.MCDOFSHOP_URL
             print('url:', url)
-            if not user.referral_code:
-                user.referral_code = generate_referral_code()
-                user.save()
-            if not user.referral_link:
-                referral_link =  f"{url}/register?ref={user.referral_code}" 
-                user.referral_link = referral_link
-                user.save()
+            user.referral_code = generate_referral_code()
+            user.save()
+
+            referral_link =  f"{url}/register?ref={user.referral_code}" 
+            user.referral_link = referral_link
+            user.save()
         except Exception as e:
             print(e)
+
+        # try:
+        #     url = settings.MCDOFSHOP_URL
+        #     print('url:', url)
+        #     if not user.referral_code:
+        #         user.referral_code = generate_referral_code()
+        #         user.save()
+        #     if not user.referral_link:
+        #         referral_link =  f"{url}/register?ref={user.referral_code}" 
+        #         user.referral_link = referral_link
+        #         user.save()
+        # except Exception as e:
+        #     print(e)
 
         # Check if the user has a referral code in the URL
         referral_code = data.get('referral_code')
