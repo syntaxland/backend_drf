@@ -23,7 +23,7 @@ class PromoCode(models.Model):
 
 class Referral(models.Model):
     referrer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="referrer")
-    referred_users = models.ManyToManyField(User, related_name="referred_users") 
+    referred_users = models.ManyToManyField(User, related_name="referred_users", default=0) 
     # user_count = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(default=timezone.now)
 

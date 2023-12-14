@@ -41,6 +41,12 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
+
+def generate_referral_code():
+    letters_and_digits = string.ascii_letters + string.digits
+    return ''.join(random.choices(letters_and_digits, k=9))
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register_user_view(request):
@@ -73,7 +79,7 @@ def register_user_view(request):
         pass
 
     try:
-        user_with_phone = User.objects.get(phone_number=phone_number)
+        user_with_phone = User.objects.get(phone_number=phone_number) 
         if user_with_phone.is_verified:
             return Response({'detail': 'A user with this phone number already exists.'}, status=status.HTTP_400_BAD_REQUEST)
     except User.DoesNotExist:
@@ -90,6 +96,19 @@ def register_user_view(request):
             password=data.get('password'),
             is_terms_conditions_read=data.get('is_terms_conditions_read'),
         )
+
+        try:
+            url = settings.MCDOFSHOP_URL
+            print('url:', url)
+            if not user.referral_code:
+                user.referral_code = generate_referral_code()
+                user.save()
+            if not user.referral_link:
+                referral_link =  f"{url}/register?ref={user.referral_code}" 
+                user.referral_link = referral_link
+                user.save()
+        except Exception as e:
+            print(e)
 
         # Check if the user has a referral code in the URL
         referral_code = data.get('referral_code')

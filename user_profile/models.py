@@ -37,14 +37,14 @@ class CustomUserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=100, unique=True)
-    username = models.CharField(max_length=100, unique=True)
+    username = models.CharField(max_length=100, unique=True, editable=False)
     first_name = models.CharField(max_length=30, null=True, blank=True)
     last_name = models.CharField(max_length=30, null=True, blank=True)
     phone_number = models.CharField(max_length=18, unique=True)
     is_verified = models.BooleanField(default=False)
     avatar = models.ImageField(upload_to='images/avatars/', null=True, blank=True) 
-    favorite_products = models.ManyToManyField('app.Product', related_name='favorited_by') 
-    viewed_products = models.ManyToManyField('app.Product', related_name='viewed_products')  
+    favorite_products = models.ManyToManyField('app.Product', related_name='favorited_by', editable=False) 
+    viewed_products = models.ManyToManyField('app.Product', related_name='viewed_products', editable=False)  
     referral_code = models.CharField(max_length=10, unique=True, null=True) 
     referral_link = models.CharField(max_length=225, unique=True, null=True)
     # referred_users = models.ManyToManyField('promo.Referral', related_name='referred_users')   
@@ -53,7 +53,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_marketplace_seller = models.BooleanField(default=False)  
     is_ecommerce_seller = models.BooleanField(default=False)  
     is_terms_conditions_read = models.BooleanField(default=False)
-    created_at = models.DateTimeField(default=timezone.now, blank=True) 
+    created_at = models.DateTimeField(default=timezone.now, blank=True, editable=False) 
   
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'phone_number']

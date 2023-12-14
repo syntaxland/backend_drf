@@ -116,7 +116,7 @@ def apply_promo_code(request):
 @api_view(['GET'])
 def get_valid_promo_products(request):
     current_datetime = timezone.now()
-    promo_products = Product.objects.filter(promo_code__expiration_date__gt=current_datetime)
+    promo_products = Product.objects.filter(promo_code__expiration_date__gt=current_datetime) 
     serializer = ProductSerializer(promo_products, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
