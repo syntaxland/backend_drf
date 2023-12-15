@@ -39,6 +39,7 @@ class AuthorAdmin(admin.ModelAdmin):
     list_display = ('created_at', 
                     'user', 
                     'amount',
+                     'cps_amount', 
                      'cps_purchase_id', 
                      'is_success', 
                      )

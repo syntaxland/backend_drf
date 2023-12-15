@@ -15,7 +15,7 @@ from .serializer import (CreditPointSerializer, CreditPointRequestSerializer,
 from .models import (CreditPoint,  CreditPointRequest,
                       CreditPointPayment, CreditPointEarning, 
                       BuyCreditPoint, SellCreditPoint)
-
+from django.db import transaction
 from django.contrib.auth import get_user_model
 
 User = get_user_model() 
@@ -143,10 +143,11 @@ def get_all_credit_point_payments(request):
         return Response(serializer.data)
     except CreditPointPayment.DoesNotExist:
         return Response({'detail': 'Credit point payments not found'}, status=status.HTTP_404_NOT_FOUND)
-
+    
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])  
+@transaction.atomic
 def buy_credit_point(request):
     user = request.user
     data = request.data
@@ -154,26 +155,44 @@ def buy_credit_point(request):
 
     cps_purchase_id = generate_cps_purchase_id()
     print('cps_purchase_id:', cps_purchase_id)
+    amount = Decimal(data.get('amount'))
+    print('amount:', amount)
 
-    amount = data.get('amount')
+    AMOUNT_TO_CPS_MAPPING = {
+    '500': 500,
+    '1000': 1000,
+    '5000': 5200,
+    '10000': 10800,
+    '15000': 16500,
+    '20000': 24000,
+    '60000': 60000,
+    '100000': 125000,
+    '250000': 255000,
+    '600000': 620000,
+    '1000000': 1500000,
+    }
+
+    cps_amount = AMOUNT_TO_CPS_MAPPING.get(str(amount), 0)
+    print('cps_amount:', cps_amount)
 
     try:
-        credit_point_request = BuyCreditPoint.objects.create(
-            user=user,
-            amount=amount,
-            cps_purchase_id=cps_purchase_id,
-        )
-
         credit_point, created = CreditPoint.objects.get_or_create(user=user)
         balance = credit_point.balance
         print('cps balance(before):', balance)
 
         credit_point.balance += amount
         credit_point.save()
-        print('cps balance(after):', balance)
 
-        credit_point_request.is_success = True
-        credit_point_request.save()
+        buy_credit_point = BuyCreditPoint.objects.create(
+            user=user,
+            amount=amount,
+            cps_purchase_id=cps_purchase_id,
+            cps_amount=cps_amount,
+        )
+
+        buy_credit_point.is_success = True
+        buy_credit_point.save()
+        print('cps balance(after):', credit_point.balance)
 
         return Response({'detail': f'Credit point request successful.'}, 
                         status=status.HTTP_201_CREATED)

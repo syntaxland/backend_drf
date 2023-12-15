@@ -41,7 +41,7 @@ class PaymentDetailsView(APIView):
         # print(public_key, reference, email)
         return Response({
             "paystackPublicKey": paystack_public_key,
-            "paysofterPublicKey": paysofter_public_key, 
+            "paysofterPublicKey": paysofter_public_key,  
             "reference": reference,
         #  "email": email,
             })
