@@ -16,6 +16,7 @@ urlpatterns = [
     path('get-user-buy-credit-point/', views.get_user_buy_credit_point, name='get-user-buy-credit-point'),
 
     path('buy-credit-point/', views.buy_credit_point, name='buy-credit-point'), 
-    path('get-user-sell-credit-point/', views.get_user_sell_credit_point, name='get-user-sell-credit-point'),
+    path('get-user-sell-credit-point/', views.get_seller_credit_point, name='get-user-sell-credit-point'),
+    path('get-buyer-credit-point/', views.get_buyer_credit_point, name='get-buyer-credit-point'),
 
 ]
