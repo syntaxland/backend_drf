@@ -273,15 +273,12 @@ def get_seller_free_ad(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
-def get_seller_active_free_ads(request):
-    seller = request.user
+def get_seller_active_free_ads(request, seller_username):
+    seller = User.objects.get(username=seller_username)
+    print('seller_username:', seller_username)
+
     current_datetime = datetime.now()
 
-    # seller = MarketplaceSellerPhoto.objects.get(seller=seller)
-
-    # ad = PostFreeAd.objects.get(id=pk)
-    # seller = ad.seller
-    
     try:
         free_ad = PostFreeAd.objects.filter(seller=seller, expiration_date__gt=current_datetime)
         serializer = PostFreeAdSerializer(free_ad, many=True)
@@ -508,11 +505,13 @@ def get_seller_paid_ad(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
-def get_seller_active_paid_ads(request):
-    user = request.user
+def get_seller_active_paid_ads(request, seller_username):
+    seller = User.objects.get(username=seller_username)
+    print('seller_username:', seller_username)
+
     current_datetime = datetime.now()
     try:
-        paid_ad = PostPaidAd.objects.filter(seller=user, expiration_date__gt=current_datetime)
+        paid_ad = PostPaidAd.objects.filter(seller=seller, expiration_date__gt=current_datetime)
         serializer = PostPaidAdSerializer(paid_ad, many=True)
         return Response(serializer.data)
     except PostPaidAd.DoesNotExist:

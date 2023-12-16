@@ -16,7 +16,7 @@ urlpatterns = [
     path('update-marketplace-seller-photo/', views.update_marketplace_seller_photo, name='update-marketplace-seller-photo'),
 
     path('get-seller-free-ad/', views.get_seller_free_ad, name='get-seller-free-ad'),
-    path('get-seller-active-free-ads/', views.get_seller_active_free_ads, name='get-seller-active-free-ads'),
+    path('get-seller-active-free-ads/<str:seller_username>/', views.get_seller_active_free_ads, name='get-seller-active-free-ads'),
     path('get-free-ad-detail/<int:pk>/', views.get_free_ad_detail, name='get-free-ad-detail'),
 
     path('edit-free-ad/', views.update_seller_free_ad, name='edit-free-ad'),
@@ -26,7 +26,7 @@ urlpatterns = [
     path('get-all-free-ad/', views.get_all_free_ad, name='get-all-free-ad'),
 
     path('get-seller-paid-ad/', views.get_seller_paid_ad, name='get-seller-paid-ad'),
-    path('get-seller-active-paid-ads/', views.get_seller_active_paid_ads, name='get-seller-active-paid-ads'),
+    path('get-seller-active-paid-ads/<str:seller_username>/', views.get_seller_active_paid_ads, name='get-seller-active-paid-ads'),
     path('get-paid-ad-detail/<int:pk>/', views.get_paid_ad_detail, name='get-paid-ad-detail'),
     path('edit-paid-ad/', views.update_seller_paid_ad, name='edit-paid-ad'),
     path('deactivate-paid-ad/', views.deactivate_paid_ad, name='delete-paid-ad'),
