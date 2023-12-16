@@ -60,7 +60,6 @@ class CreditPointPaymentSerializer(serializers.ModelSerializer):
 
 
 class BuyCreditPointSerializer(serializers.ModelSerializer):
-    email = serializers.CharField(source='user.email', read_only=True)
     username = serializers.CharField(source='user.username', read_only=True)
     class Meta:
         model = BuyCreditPoint
@@ -68,8 +67,8 @@ class BuyCreditPointSerializer(serializers.ModelSerializer):
 
 
 class SellCreditPointSerializer(serializers.ModelSerializer):
-    email = serializers.CharField(source='user.email', read_only=True)
-    username = serializers.CharField(source='user.username', read_only=True)
+    seller_username = serializers.CharField(source='seller.username', read_only=True)
+    buyer_username = serializers.CharField(source='buyer.username', read_only=True)
     class Meta:
         model = SellCreditPoint
-        fields = "__all__"
+        fields = "__all__" 

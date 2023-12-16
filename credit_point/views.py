@@ -123,11 +123,11 @@ def get_user_credit_point_earnings(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_user_credit_point_payments(request):
+def get_user_credit_point(request):
     user = request.user
     try:
-        credit_point_payments = CreditPointPayment.objects.filter(referrer=user).order_by('-created_at')
-        serializer = CreditPointPaymentSerializer(credit_point_payments, many=True)
+        credit_point = CreditPointPayment.objects.filter(referrer=user).order_by('-created_at')
+        serializer = CreditPointPaymentSerializer(credit_point, many=True)
         return Response(serializer.data)
     except CreditPointPayment.DoesNotExist:
         return Response({'detail': 'Credit point payments not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -136,7 +136,7 @@ def get_user_credit_point_payments(request):
 @api_view(['GET'])
 # @permission_classes([IsAdminUser]) 
 @permission_classes([IsAuthenticated])
-def get_all_credit_point_payments(request):
+def get_all_credit_point(request):
     try:
         all_credit_points_payments = CreditPointPayment.objects.all().order_by('-created_at')
         serializer = CreditPointPaymentSerializer(all_credit_points_payments, many=True)
@@ -183,7 +183,7 @@ def buy_credit_point(request):
         credit_point.balance += amount
         credit_point.save()
 
-        buy_credit_point = BuyCreditPoint.objects.create(
+        buy_credit_point = BuyCreditPoint.objects.create( 
             user=user,
             amount=amount,
             cps_purchase_id=cps_purchase_id,
@@ -255,3 +255,27 @@ def sell_credit_point(request):
             return Response({'detail': 'Credit point not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_buy_credit_point(request):
+    user = request.user
+    try:
+        credit_point = BuyCreditPoint.objects.filter(user=user).order_by('-created_at')
+        serializer = BuyCreditPointSerializer(credit_point, many=True) 
+        return Response(serializer.data)
+    except BuyCreditPoint.DoesNotExist:
+        return Response({'detail': 'Credit point not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_sell_credit_point(request):
+    user = request.user
+    try:
+        credit_point = SellCreditPoint.objects.filter(seller=user).order_by('-created_at')
+        serializer = SellCreditPointSerializer(credit_point, many=True)
+        return Response(serializer.data)
+    except SellCreditPoint.DoesNotExist:
+        return Response({'detail': 'Credit point not found'}, status=status.HTTP_404_NOT_FOUND)

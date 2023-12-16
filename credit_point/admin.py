@@ -48,8 +48,8 @@ class AuthorAdmin(admin.ModelAdmin):
 @admin.register(models.SellCreditPoint)
 class AuthorAdmin(admin.ModelAdmin):
     list_display = ('created_at',
-                     'buyer', 
                      'seller', 
+                     'buyer', 
                     'amount',                  
                     'cps_sell_id', 
                     'is_success', 
