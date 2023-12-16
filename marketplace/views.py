@@ -273,14 +273,14 @@ def get_seller_free_ad(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
-def get_seller_active_free_ads(request, pk):
-    # user = request.user
+def get_seller_active_free_ads(request):
+    seller = request.user
     current_datetime = datetime.now()
 
     # seller = MarketplaceSellerPhoto.objects.get(seller=seller)
 
-    ad = PostFreeAd.objects.get(id=pk)
-    seller = ad.seller
+    # ad = PostFreeAd.objects.get(id=pk)
+    # seller = ad.seller
     
     try:
         free_ad = PostFreeAd.objects.filter(seller=seller, expiration_date__gt=current_datetime)
