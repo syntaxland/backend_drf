@@ -19,7 +19,9 @@ from .serializers import (MarketPlaceSellerAccountSerializer,
                              PostFreeAdSerializer, PostPaidAdSerializer, 
                              PaysofterApiKeySerializer, MessageSerializer,
                             )
+from user_profile.serializers import UserSerializer
 
+from django.db.models import Q
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -899,3 +901,43 @@ def list_paid_ad_messages(request, pk):
         return Response(serializer.data)
     except Message.DoesNotExist:
         return Response({'detail': 'Message not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
+def search_sellers_and_ads(request, search_term):
+    try:
+        # Search for sellers by username
+        sellers = User.objects.filter(username__icontains=search_term)
+
+        # Search for PostFreeAd and PostPaidAd instances related to the sellers
+        free_ads = PostFreeAd.objects.filter(Q(seller__in=sellers) & Q(ad_name__icontains=search_term))
+        paid_ads = PostPaidAd.objects.filter(Q(seller__in=sellers) & Q(ad_name__icontains=search_term))
+
+        # Serialize the results
+        seller_serializer = UserSerializer(sellers, many=True)
+        free_ads_serializer = PostFreeAdSerializer(free_ads, many=True)
+        paid_ads_serializer = PostPaidAdSerializer(paid_ads, many=True)
+
+        return Response({
+            'sellers': seller_serializer.data,
+            'free_ads': free_ads_serializer.data,
+            'paid_ads': paid_ads_serializer.data,
+        }, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+@api_view(['GET'])
+def search_seller_by_username(request, seller_username):
+    try:
+        seller = User.objects.get(username=seller_username, is_marketplace_seller=True)
+        serializer = UserSerializer(seller)
+        return Response(serializer.data, status=200)
+    except User.DoesNotExist:
+        return Response({'detail': 'Seller not found'}, status=404)
+    except Exception as e:
+        return Response({'detail': str(e)}, status=500)

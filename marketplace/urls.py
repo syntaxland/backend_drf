@@ -44,5 +44,5 @@ urlpatterns = [
     path('list-free-ad-messages/<int:pk>/', views.list_free_ad_messages, name='list-free-ad-messages'),
 
     
-
+    path('marketplace/search/<str:search_term>/', views.search_sellers_and_ads, name='search_sellers_and_ads'),
 ]

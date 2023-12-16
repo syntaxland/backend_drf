@@ -473,7 +473,7 @@ class ProductDetailView(generics.RetrieveAPIView):
             queryset = self.get_queryset()
             keyword = self.request.query_params.get('search', None)
             if keyword:
-                queryset = queryset.filter(Q(name__icontains=keyword) | Q(description__icontains=keyword)) 
+                queryset = queryset.filter(Q(name__icontains=keyword) | Q(description__icontains=keyword))  
                 serializer = self.get_serializer(queryset, many=True)
                 return Response(serializer.data)
             else:
