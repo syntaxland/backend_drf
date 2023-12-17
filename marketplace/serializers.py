@@ -1,10 +1,15 @@
 # marketplace/serializers.py
 from rest_framework import serializers
-from .models import MarketPlaceSellerAccount, MarketplaceSellerPhoto, PostFreeAd, PostPaidAd, PaysofterApiKey, Message
+from .models import (MarketPlaceSellerAccount, MarketplaceSellerPhoto, 
+                     PostFreeAd, PostPaidAd, PaysofterApiKey, Message)
 
 
 class MarketPlaceSellerAccountSerializer(serializers.ModelSerializer):
     business_phone = serializers.CharField(source='seller.phone_number', read_only=True)
+    seller_phone = serializers.CharField(source='seller.phone_number', read_only=True)
+    seller_username = serializers.CharField(source='seller.username', read_only=True)
+    seller_joined_since = serializers.CharField(source='seller.created_at', read_only=True)
+
     class Meta:
         model = MarketPlaceSellerAccount
         fields = '__all__'

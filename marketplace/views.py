@@ -901,7 +901,55 @@ def list_paid_ad_messages(request, pk):
         return Response(serializer.data)
     except Message.DoesNotExist:
         return Response({'detail': 'Message not found'}, status=status.HTTP_404_NOT_FOUND)
+    
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def search_seller_username(request, seller_username):
+
+    try:
+        seller = User.objects.get(username=seller_username, is_marketplace_seller=True)
+        serializer = UserSerializer(seller)
+    
+        try:
+            seller_avatar = MarketplaceSellerPhoto.objects.get(seller=seller)
+            seller_avatar_url = seller_avatar.photo.url
+        except MarketplaceSellerPhoto.DoesNotExist:
+            seller_avatar_url = None
+
+        seller_detail = MarketPlaceSellerAccount.objects.get(seller=seller)
+        serializer = MarketPlaceSellerAccountSerializer(seller_detail)
+        return Response({'data': serializer.data, 'seller_avatar_url': seller_avatar_url}, status=status.HTTP_200_OK)
+    
+    except User.DoesNotExist:
+        return Response({'detail': 'Seller not found'}, status=status.HTTP_404_NOT_FOUND)
+    except MarketPlaceSellerAccount.DoesNotExist:
+        return Response({'detail': 'Seller detail not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    except Exception as e:
+        return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
+def get_seller_detail(request, seller_username):
+
+    seller = User.objects.get(username=seller_username)
+
+    try:
+        seller_avatar = MarketplaceSellerPhoto.objects.get(seller=seller)
+        seller_avatar_url = seller_avatar.photo.url
+    except MarketplaceSellerPhoto.DoesNotExist:
+        seller_avatar_url = None
+
+    try:
+        seller_detail = MarketPlaceSellerAccount.objects.get(seller=seller)
+        serializer = MarketPlaceSellerAccountSerializer(seller_detail)
+        return Response({'data': serializer.data, 'seller_avatar_url': seller_avatar_url}, status=status.HTTP_200_OK)
+    
+    except MarketPlaceSellerAccount.DoesNotExist:
+        return Response({'detail': 'Seller detail not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
@@ -929,15 +977,3 @@ def search_sellers_and_ads(request, search_term):
 
     except Exception as e:
         return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-
-@api_view(['GET'])
-def search_seller_by_username(request, seller_username):
-    try:
-        seller = User.objects.get(username=seller_username, is_marketplace_seller=True)
-        serializer = UserSerializer(seller)
-        return Response(serializer.data, status=200)
-    except User.DoesNotExist:
-        return Response({'detail': 'Seller not found'}, status=404)
-    except Exception as e:
-        return Response({'detail': str(e)}, status=500)
