@@ -802,56 +802,6 @@ def list_free_ad_messages(request, pk):
         return Response({'detail': 'Message not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def create_free_ad_message(request):
-#     user=request.user
-#     data=request.data
-#     print('data:', data, 'user:', user)
-
-#     pk = data.get('pk')
-#     message = data.get('message')
-#     print('pk:', pk)
-#     print('message:', message)
-    
-#     try:
-#         free_ad = PostFreeAd.objects.get(id=pk)
-#     except PostFreeAd.DoesNotExist:
-#         return Response({'detail': 'Message not found'}, status=status.HTTP_404_NOT_FOUND)
-    
-#     Message.objects.create(
-#             user=user,
-#             message=message,
-#             free_ad=free_ad,
-#         )
-#     return Response({'message': 'Message created'}, status=status.HTTP_201_CREATED)
-
-
-# @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-# def list_free_ad_messages(request, pk):
-#     user = request.user
-#     # data  = request.data
-#     # print('data:', data)
-#     print('user:', user)
-
-#     try:
-#         message = PostFreeAd.objects.get(id=pk)
-#     except PostFreeAd.DoesNotExist:
-#         return Response({'detail': 'Message not found'}, status=status.HTTP_404_NOT_FOUND)
-    
-#     print('message:', message)
-    
-#     try:
-#         message = Message.objects.filter(
-#             message=message,
-#             ).order_by('timestamp')
-#         serializer = MessageSerializer(message, many=True)
-#         return Response(serializer.data)
-#     except Message.DoesNotExist:
-#         return Response({'detail': 'Message not found'}, status=status.HTTP_404_NOT_FOUND)
-
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_paid_ad_message(request):
@@ -946,6 +896,7 @@ def get_seller_detail(request, seller_username):
     try:
         seller_detail = MarketPlaceSellerAccount.objects.get(seller=seller)
         serializer = MarketPlaceSellerAccountSerializer(seller_detail)
+
         return Response({'data': serializer.data, 'seller_avatar_url': seller_avatar_url}, status=status.HTTP_200_OK)
     
     except MarketPlaceSellerAccount.DoesNotExist:
@@ -953,27 +904,29 @@ def get_seller_detail(request, seller_username):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
-@parser_classes([MultiPartParser, FormParser])
-def search_sellers_and_ads(request, search_term):
-    try:
-        # Search for sellers by username
-        sellers = User.objects.filter(username__icontains=search_term)
+@permission_classes([AllowAny])
+def search_ads(request, search_term):
+    search_term = search_term.strip()
+    current_datetime = datetime.now()
 
-        # Search for PostFreeAd and PostPaidAd instances related to the sellers
-        free_ads = PostFreeAd.objects.filter(Q(seller__in=sellers) & Q(ad_name__icontains=search_term))
-        paid_ads = PostPaidAd.objects.filter(Q(seller__in=sellers) & Q(ad_name__icontains=search_term))
+    free_ads = PostFreeAd.objects.filter(
+        Q(ad_name__icontains=search_term) |
+        Q(description__icontains=search_term) |
+        Q(brand__icontains=search_term),
+        expiration_date__gt=current_datetime
+    )
 
-        # Serialize the results
-        seller_serializer = UserSerializer(sellers, many=True)
-        free_ads_serializer = PostFreeAdSerializer(free_ads, many=True)
-        paid_ads_serializer = PostPaidAdSerializer(paid_ads, many=True)
+    paid_ads = PostPaidAd.objects.filter(
+        Q(ad_name__icontains=search_term) |
+        Q(description__icontains=search_term) |
+        Q(brand__icontains=search_term),
+        expiration_date__gt=current_datetime
+    )
 
-        return Response({
-            'sellers': seller_serializer.data,
-            'free_ads': free_ads_serializer.data,
-            'paid_ads': paid_ads_serializer.data,
-        }, status=status.HTTP_200_OK)
+    free_ads_serializer = PostFreeAdSerializer(free_ads, many=True)
+    paid_ads_serializer = PostPaidAdSerializer(paid_ads, many=True)
 
-    except Exception as e:
-        return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return Response({
+        'free_ads': free_ads_serializer.data,
+        'paid_ads': paid_ads_serializer.data,
+    }, status=status.HTTP_200_OK)
