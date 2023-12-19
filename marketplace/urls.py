@@ -43,6 +43,8 @@ urlpatterns = [
     path('create-free-ad-message/', views.create_free_ad_message, name='create-free-ad-message'),
     path('list-free-ad-messages/<int:pk>/', views.list_free_ad_messages, name='list-free-ad-messages'),
 
+    path('get-seller-shopfront-link/', views.get_seller_shopfront_link, name='get-seller-shopfront-link'),
+
     path('search-seller-username/<str:seller_username>/', views.search_seller_username, name='search-seller-username'),
     path('get-seller-detail/<str:seller_username>/', views.get_seller_detail, name='get-seller-detail'),
 

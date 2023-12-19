@@ -2,6 +2,9 @@
 from decimal import Decimal
 from datetime import datetime, timedelta, timezone
 
+import nltk
+from nltk.corpus import wordnet
+
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -21,6 +24,7 @@ from .serializers import (MarketPlaceSellerAccountSerializer,
                             )
 from user_profile.serializers import UserSerializer
 
+from django.conf import settings
 from django.db.models import Q
 from django.contrib.auth import get_user_model
 
@@ -880,6 +884,24 @@ def search_seller_username(request, seller_username):
         return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_seller_shopfront_link(request):
+    user = request.user
+    url = settings.MCDOFSHOP_URL
+    print("url:", url)
+    print("user:", user)
+
+    try:
+        shopfront_link =  f"{url}/seller-shop-front/{user.username}/"
+        print("shopfront_link:", shopfront_link)
+        return Response({"shopfrontLink": shopfront_link}, status=status.HTTP_200_OK)
+    except object.DoesNotExist:
+        return Response({'detail': 'Link not found'}, status=status.HTTP_404_NOT_FOUND)
+    # except Exception as e:
+    #     return Response( {"error": str(e)},  status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
@@ -906,27 +928,96 @@ def get_seller_detail(request, seller_username):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def search_ads(request, search_term):
-    search_term = search_term.strip()
-    current_datetime = datetime.now()
 
-    free_ads = PostFreeAd.objects.filter(
-        Q(ad_name__icontains=search_term) |
-        Q(description__icontains=search_term) |
-        Q(brand__icontains=search_term),
-        expiration_date__gt=current_datetime
-    )
+    try:
+        search_term = search_term.strip()
+        current_datetime = datetime.now()
 
-    paid_ads = PostPaidAd.objects.filter(
-        Q(ad_name__icontains=search_term) |
-        Q(description__icontains=search_term) |
-        Q(brand__icontains=search_term),
-        expiration_date__gt=current_datetime
-    )
+        free_ads = PostFreeAd.objects.filter(
+            Q(ad_name__icontains=search_term) |
+            Q(description__icontains=search_term) |
+            Q(brand__icontains=search_term),
+            expiration_date__gt=current_datetime
+        )
 
-    free_ads_serializer = PostFreeAdSerializer(free_ads, many=True)
-    paid_ads_serializer = PostPaidAdSerializer(paid_ads, many=True)
+        paid_ads = PostPaidAd.objects.filter(
+            Q(ad_name__icontains=search_term) |
+            Q(description__icontains=search_term) |
+            Q(brand__icontains=search_term),
+            expiration_date__gt=current_datetime
+        )
 
-    return Response({
-        'free_ads': free_ads_serializer.data,
-        'paid_ads': paid_ads_serializer.data,
-    }, status=status.HTTP_200_OK)
+        free_ads_serializer = PostFreeAdSerializer(free_ads, many=True)
+        paid_ads_serializer = PostPaidAdSerializer(paid_ads, many=True)
+
+        if not free_ads.exists() and not paid_ads.exists():
+            raise PostFreeAd.DoesNotExist
+        return Response({
+            'free_ads': free_ads_serializer.data,
+            'paid_ads': paid_ads_serializer.data,
+        }, status=status.HTTP_200_OK)
+    
+    except PostFreeAd.DoesNotExist:
+        return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
+    except PostPaidAd.DoesNotExist:
+        return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# @api_view(['GET'])
+# @permission_classes([AllowAny])
+# def search_ads(request, search_term):
+
+#     try:
+#         nltk.download('wordnet')
+
+#         search_term = search_term.strip()
+#         current_datetime = datetime.now()
+
+#         synonyms = set()
+#         for syn in wordnet.synsets(search_term):
+#             for lemma in syn.lemmas():
+#                 synonyms.add(lemma.name())
+
+#         synonyms.add(search_term)
+
+#         free_ads = PostFreeAd.objects.filter(
+#             Q(ad_name__icontains=search_term) |
+#             Q(description__icontains=search_term) |
+#             Q(brand__icontains=search_term) |
+#             Q(ad_name__icontains=synonyms) |
+#             Q(description__icontains=synonyms) |
+#             Q(brand__icontains=synonyms),
+#             expiration_date__gt=current_datetime
+#         )
+
+#         paid_ads = PostPaidAd.objects.filter(
+#             Q(ad_name__icontains=search_term) |
+#             Q(description__icontains=search_term) |
+#             Q(brand__icontains=search_term) |
+#             Q(ad_name__icontains=synonyms) |
+#             Q(description__icontains=synonyms) |
+#             Q(brand__icontains=synonyms),
+#             expiration_date__gt=current_datetime
+#         )
+
+#         free_ads_serializer = PostFreeAdSerializer(free_ads, many=True)
+#         paid_ads_serializer = PostPaidAdSerializer(paid_ads, many=True)
+
+#         if not free_ads.exists() and not paid_ads.exists():
+#             raise PostFreeAd.DoesNotExist  
+
+#         return Response({
+#             'free_ads': free_ads_serializer.data,
+#             'paid_ads': paid_ads_serializer.data,
+#         }, status=status.HTTP_200_OK)
+
+#     except PostFreeAd.DoesNotExist:
+#         return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
+#     except PostPaidAd.DoesNotExist:
+#         return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
+#     except Exception as e:
+#         return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
