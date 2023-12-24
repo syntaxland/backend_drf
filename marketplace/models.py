@@ -250,7 +250,7 @@ class MarketplaceSellerPhoto(models.Model):
     photo = models.ImageField(upload_to='media/sellers/')
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
-    def __str__(self):
+    def __str__(self): 
         return f'Photo {self.pk}'
 
 
