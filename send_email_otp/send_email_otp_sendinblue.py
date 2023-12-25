@@ -7,11 +7,9 @@ import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 
 from .models import EmailOtp
-from user_profile.serializers import UserSerializer
 from .serializers import EmailOTPSendSerializer
 
 from django.conf import settings
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -46,13 +44,13 @@ def send_email_otp(request):
                 </head>
                 <body>
                     <p>Dear {first_name.title()},</p>
-                    <p>Thank you for signing up with our service.</p>
+                    <p>Thank you for signing up to our service.</p>
                     <p>To complete your registration, please use the OTP provided below:</p>
                     <h2>OTP: {email_otp.email_otp}</h2>
                     <p>This OTP is valid for 30 minutes.</p>
                     <p>If you didn't request this verification email, please ignore it.</p>
                     <p>Best regards,</p>
-                    <p>McdofGlobal Team</p>
+                    <p>Sellangle Inc.</p>
                 </body>
                 </html>
             """ 
