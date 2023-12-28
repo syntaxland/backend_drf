@@ -21,6 +21,19 @@ BUY_CPS_CHOICES = (
     ('1000000', '1,500,000 cps for NGN 1,000,000'),
 )
 
+USD_CPS_CHOICES = (
+    ('1', '1,000 cps for USD 1'),
+    ('5', '5,200 cps for USD 5'),
+    ('10', '10,800 cps for USD 10'),
+    ('15', '16,500 cps for USD 15'),
+    ('20', '24,000 cps for USD 20'),
+    ('60', '60,000 cps for USD 50'),
+    ('100', '125,000 cps for USD 100'),
+    ('200', '255,000 cps for USD 200'),
+    ('500', '700,000 cps for USD 500'),
+    ('1000', '1,500,000 cps for USD 1,000'),
+)
+
 
 class CreditPoint(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
@@ -78,4 +91,12 @@ class SellCreditPoint(models.Model):
     cps_sell_id = models.CharField(max_length=10, unique=True, blank=True)
     is_success = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
- 
+
+class BuyUsdCreditPoint(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='usd_cps_user')
+    amount = models.CharField(max_length=100, choices=USD_CPS_CHOICES, null=True, blank=True, editable=False)
+    cps_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0, editable=False)
+    usd_cps_purchase_id = models.CharField(max_length=10, unique=True, blank=True)
+    is_success = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+

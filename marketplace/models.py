@@ -2,6 +2,7 @@
 from datetime import datetime, timedelta
 from django.db import models
 from django.contrib.auth import get_user_model
+# from cities_light.models import City, Region, Country
 
 User = get_user_model()
 
@@ -73,7 +74,7 @@ BUSINESS_CATEGORY_CHOICES = [
 ]
 
 ID_TYPE_CHOICES = [
-    ('NIN', 'NIN'),
+    # ('NIN', 'NIN'),
     ('Intl Passport', 'Intl Passport'), 
     ('Driving License', 'Driving License'),
     ('Govt Issued ID', 'Govt Issued ID'),
@@ -213,6 +214,167 @@ AD_TYPE_CHOICES = [
     ("Others", "Others"),
 ]
 
+CURRENCY_CHOICES = (
+    ('NGN', 'NGN'),
+    ('USD', 'USD'),
+    ('CAD', 'CAD'),
+    ('EUR', 'EUR'),
+    ('GBP', 'GBP'),
+    ('GHS', 'GHS'),
+    ('INR', 'INR'),
+    ('CNY', 'CNY'),
+    ('ZAR', 'ZAR'),
+    ('AED', 'United Arab Emirates Dirham'),
+    ('AUD', 'Australian Dollar'),
+    ('BRL', 'Brazilian Real'),
+    ('JPY', 'Japanese Yen'),
+    ('KES', 'Kenyan Shilling'),
+    ('SAR', 'Saudi Riyal'),
+    # Additional currencies sorted alphabetically
+    ('AFN', 'Afghan Afghani'),
+    ('ALL', 'Albanian Lek'),
+    ('AMD', 'Armenian Dram'),
+    ('ANG', 'Netherlands Antillean Guilder'),
+    ('AOA', 'Angolan Kwanza'),
+    ('ARS', 'Argentine Peso'),
+    ('AWG', 'Aruban Florin'),
+    ('AZN', 'Azerbaijani Manat'),
+    ('BAM', 'Bosnia-Herzegovina Convertible Mark'),
+    ('BBD', 'Barbadian Dollar'),
+    ('BDT', 'Bangladeshi Taka'),
+    ('BGN', 'Bulgarian Lev'),
+    ('BHD', 'Bahraini Dinar'),
+    ('BIF', 'Burundian Franc'),
+    ('BMD', 'Bermudian Dollar'),
+    ('BND', 'Brunei Dollar'),
+    ('BOB', 'Bolivian Boliviano'),
+    ('BSD', 'Bahamian Dollar'),
+    ('BTN', 'Bhutanese Ngultrum'),
+    ('BWP', 'Botswanan Pula'),
+    ('BYN', 'Belarusian Ruble'),
+    ('BZD', 'Belize Dollar'),
+    ('CDF', 'Congolese Franc'),
+    ('CHF', 'Swiss Franc'),
+    ('CLP', 'Chilean Peso'),
+    ('COP', 'Colombian Peso'),
+    ('CRC', 'Costa Rican Colón'),
+    ('CUP', 'Cuban Peso'),
+    ('CVE', 'Cape Verdean Escudo'),
+    ('CZK', 'Czech Republic Koruna'),
+    ('DJF', 'Djiboutian Franc'),
+    ('DKK', 'Danish Krone'),
+    ('DOP', 'Dominican Peso'),
+    ('DZD', 'Algerian Dinar'),
+    ('EGP', 'Egyptian Pound'),
+    ('ERN', 'Eritrean Nakfa'),
+    ('ETB', 'Ethiopian Birr'),
+    ('FJD', 'Fijian Dollar'),
+    ('FKP', 'Falkland Islands Pound'),
+    ('FOK', 'Faroe Islands Króna'),
+    ('GEL', 'Georgian Lari'),
+    ('GGP', 'Guernsey Pound'),
+    ('GIP', 'Gibraltar Pound'),
+    ('GMD', 'Gambian Dalasi'),
+    ('GNF', 'Guinean Franc'),
+    ('GTQ', 'Guatemalan Quetzal'),
+    ('GYD', 'Guyanaese Dollar'),
+    ('HKD', 'Hong Kong Dollar'),
+    ('HNL', 'Honduran Lempira'),
+    ('HRK', 'Croatian Kuna'),
+    ('HTG', 'Haitian Gourde'),
+    ('HUF', 'Hungarian Forint'),
+    ('IDR', 'Indonesian Rupiah'),
+    ('ILS', 'Israeli New Shekel'),
+    ('IMP', 'Isle of Man Pound'),
+    ('IQD', 'Iraqi Dinar'),
+    ('IRR', 'Iranian Rial'),
+    ('ISK', 'Icelandic Króna'),
+    ('JEP', 'Jersey Pound'),
+    ('JMD', 'Jamaican Dollar'),
+    ('JOD', 'Jordanian Dinar'),
+    ('KGS', 'Kyrgystani Som'),
+    ('KHR', 'Cambodian Riel'),
+    ('KID', 'Kiribati Dollar'),
+    ('KWD', 'Kuwaiti Dinar'),
+    ('KYD', 'Cayman Islands Dollar'),
+    ('KZT', 'Kazakhstani Tenge'),
+    ('LAK', 'Laotian Kip'),
+    ('LBP', 'Lebanese Pound'),
+    ('LKR', 'Sri Lankan Rupee'),
+    ('LRD', 'Liberian Dollar'),
+    ('LSL', 'Lesotho Loti'),
+    ('LYD', 'Libyan Dinar'),
+    ('MAD', 'Moroccan Dirham'),
+    ('MDL', 'Moldovan Leu'),
+    ('MGA', 'Malagasy Ariary'),
+    ('MKD', 'Macedonian Denar'),
+    ('MMK', 'Myanma Kyat'),
+    ('MNT', 'Mongolian Tugrik'),
+    ('MOP', 'Macanese Pataca'),
+    ('MRU', 'Mauritanian Ouguiya'),
+    ('MUR', 'Mauritian Rupee'),
+    ('MVR', 'Maldivian Rufiyaa'),
+    ('MWK', 'Malawian Kwacha'),
+    ('MXN', 'Mexican Peso'),
+    ('MYR', 'Malaysian Ringgit'),
+    ('MZN', 'Mozambican Metical'),
+    ('NAD', 'Namibian Dollar'),
+    ('NIO', 'Nicaraguan Córdoba'),
+    ('NOK', 'Norwegian Krone'),
+    ('NPR', 'Nepalese Rupee'),
+    ('NZD', 'New Zealand Dollar'),
+    ('OMR', 'Omani Rial'),
+    ('PAB', 'Panamanian Balboa'),
+    ('PEN', 'Peruvian Nuevo Sol'),
+    ('PGK', 'Papua New Guinean Kina'),
+    ('PHP', 'Philippine Peso'),
+    ('PKR', 'Pakistani Rupee'),
+    ('PLN', 'Polish Złoty'),
+    ('PYG', 'Paraguayan Guarani'),
+    ('QAR', 'Qatari Rial'),
+    ('RON', 'Romanian Leu'),
+    ('RSD', 'Serbian Dinar'),
+    ('RUB', 'Russian Ruble'),
+    ('RWF', 'Rwandan Franc'),
+    ('SBD', 'Solomon Islands Dollar'),
+    ('SCR', 'Seychellois Rupee'),
+    ('SDG', 'Sudanese Pound'),
+    ('SEK', 'Swedish Krona'),
+    ('SGD', 'Singapore Dollar'),
+    ('SHP', 'Saint Helena Pound'),
+    ('SLL', 'Sierra Leonean Leone'),
+    ('SOS', 'Somali Shilling'),
+    ('SRD', 'Surinamese Dollar'),
+    ('SSP', 'South Sudanese Pound'),
+    ('STN', 'São Tomé and Príncipe Dobra'),
+    ('SYP', 'Syrian Pound'),
+    ('SZL', 'Swazi Lilangeni'),
+    ('TJS', 'Tajikistani Somoni'),
+    ('TMT', 'Turkmenistani Manat'),
+    ('TND', 'Tunisian Dinar'),
+    ('TOP', 'Tongan Paʻanga'),
+    ('TRY', 'Turkish Lira'),
+    ('TTD', 'Trinidad and Tobago Dollar'),
+    ('TVD', 'Tuvaluan Dollar'),
+    ('TWD', 'New Taiwan Dollar'),
+    ('TZS', 'Tanzanian Shilling'),
+    ('UAH', 'Ukrainian Hryvnia'),
+    ('UGX', 'Ugandan Shilling'),
+    ('UYU', 'Uruguayan Peso'),
+    ('UZS', 'Uzbekistan Som'),
+    ('VES', 'Venezuelan Bolívar'),
+    ('VND', 'Vietnamese Đồng'),
+    ('VUV', 'Vanuatu Vatu'),
+    ('WST', 'Samoan Tala'),
+    ('XAF', 'Central African CFA Franc'),
+    ('XCD', 'Eastern Caribbean Dollar'),
+    ('XDR', 'Special Drawing Rights'),
+    ('XOF', 'West African CFA franc'),
+    ('XPF', 'CFP Franc'),
+    ('YER', 'Yemeni Rial'),
+    ('ZMW', 'Zambian Kwacha'),
+)
+
 
 class MarketPlaceSellerAccount(models.Model):
     seller = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="seller_account_user")
@@ -262,9 +424,14 @@ class PostFreeAd(models.Model):
     ad_category = models.CharField(max_length=100, choices=AD_CATEGORY_CHOICES, null=True, blank=True)
     ad_type = models.CharField(max_length=100, choices=AD_TYPE_CHOICES, null=True, blank=True)
     location = models.CharField(max_length=255, null=True, blank=True)
+    country = models.CharField(max_length=255, null=True, blank=True)
+    state_province = models.CharField(max_length=255, null=True, blank=True)
+    city = models.CharField(max_length=255, null=True, blank=True)
     condition = models.CharField(max_length=100, choices=AD_CONDITION_CHOICES, null=True, blank=True)
     # ad_charges = models.DecimalField(max_digits=16, decimal_places=2, default=0)
+    currency = models.CharField(max_length=50, choices=CURRENCY_CHOICES, default='NGN', null=True, blank=True)
     price = models.DecimalField(max_digits=16, decimal_places=2, null=True)
+    usd_price = models.DecimalField(max_digits=16, decimal_places=2, null=True, blank=True)
     is_price_negotiable = models.BooleanField(default=False)
     promo_price = models.DecimalField(max_digits=16, decimal_places=2, null=True, blank=True)    
     brand = models.CharField(max_length=255, blank=True, null=True) 
@@ -277,7 +444,7 @@ class PostFreeAd(models.Model):
     phone_view_count = models.PositiveIntegerField(default=0, editable=False)
     phone_view_user_count = models.PositiveIntegerField(default=0, editable=False)
     ad_view_count = models.PositiveIntegerField(default=0, editable=False)
-    count_in_stock = models.IntegerField(null=True, blank=True, default=0)
+    count_in_stock = models.IntegerField(null=True, blank=True)
     ad_count = models.PositiveIntegerField(default=0, editable=False)
     is_active = models.BooleanField(default=False)
     image1 = models.ImageField(upload_to='./media/marketplace', null=True, blank=True)
@@ -322,8 +489,13 @@ class PostPaidAd(models.Model):
     ad_category = models.CharField(max_length=100, choices=AD_CATEGORY_CHOICES, null=True, blank=True)
     ad_type = models.CharField(max_length=100, choices=AD_TYPE_CHOICES, null=True, blank=True)
     location = models.CharField(max_length=255, null=True, blank=True)
+    country = models.CharField(max_length=255, null=True, blank=True)
+    state_province = models.CharField(max_length=255, null=True, blank=True)
+    city = models.CharField(max_length=255, null=True, blank=True)
     condition = models.CharField(max_length=100, choices=AD_CONDITION_CHOICES, null=True, blank=True)
+    currency = models.CharField(max_length=50, choices=CURRENCY_CHOICES, default='NGN', null=True, blank=True)
     price = models.DecimalField(max_digits=16, decimal_places=2, null=True)
+    usd_price = models.DecimalField(max_digits=16, decimal_places=2, null=True, blank=True)
     promo_price = models.DecimalField(max_digits=16, decimal_places=2, null=True, blank=True)    
     brand = models.CharField(max_length=255, blank=True, null=True) 
     promo_code = models.CharField(max_length=10, null=True, blank=True)
@@ -338,7 +510,7 @@ class PostPaidAd(models.Model):
     num_reviews = models.IntegerField(null=True, blank=True, default=0, editable=False)
     ad_save_count = models.PositiveIntegerField(default=0, editable=False)
     ad_view_count = models.PositiveIntegerField(default=0, editable=False)
-    count_in_stock = models.IntegerField(null=True, blank=True, default=0)
+    count_in_stock = models.IntegerField(null=True, blank=True)
     ad_count = models.PositiveIntegerField(default=0, editable=False)
     is_auto_renewal = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)

@@ -70,7 +70,6 @@ def create_free_ad(request):
     data = request.data
     serializer = PostFreeAdSerializer(data=data)
 
-
     try:
         free_ad_count = PostFreeAd.objects.filter(seller=seller).count()
         print('free_ad_count:', free_ad_count)
