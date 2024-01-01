@@ -375,6 +375,11 @@ CURRENCY_CHOICES = (
     ('ZMW', 'Zambian Kwacha'),
 )
 
+MAIN_CURRENCY_CHOICES = (
+    ('NGN', 'NGN'),
+    ('USD', 'USD'),
+)
+
 
 class MarketPlaceSellerAccount(models.Model):
     seller = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="seller_account_user")
@@ -494,9 +499,10 @@ class PostPaidAd(models.Model):
     state_province = models.CharField(max_length=255, null=True, blank=True)
     city = models.CharField(max_length=255, null=True, blank=True)
     condition = models.CharField(max_length=100, choices=AD_CONDITION_CHOICES, null=True, blank=True)
-    currency = models.CharField(max_length=50, choices=CURRENCY_CHOICES, default='NGN', null=True, blank=True)
+    currency = models.CharField(max_length=50, choices=MAIN_CURRENCY_CHOICES, default='NGN', null=True, blank=True)
     price = models.DecimalField(max_digits=16, decimal_places=2, null=True)
     usd_price = models.DecimalField(max_digits=16, decimal_places=2, null=True, blank=True)
+    usd_currency = models.CharField(max_length=50, choices=CURRENCY_CHOICES, default='USD', null=True)
     promo_price = models.DecimalField(max_digits=16, decimal_places=2, null=True, blank=True)    
     brand = models.CharField(max_length=255, blank=True, null=True) 
     promo_code = models.CharField(max_length=10, null=True, blank=True)
