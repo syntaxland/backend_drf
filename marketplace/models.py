@@ -2,7 +2,6 @@
 from datetime import datetime, timedelta
 from django.db import models
 from django.contrib.auth import get_user_model
-# from cities_light.models import City, Region, Country
 
 User = get_user_model()
 

@@ -483,10 +483,27 @@ def delete_free_ad(request):
 @permission_classes([AllowAny])
 @parser_classes([MultiPartParser, FormParser])
 def get_all_free_ad(request):
+
     current_datetime = datetime.now()
+
+    selected_country = request.GET.get('country', '')
+    selected_state = request.GET.get('state', '')
+    selected_city = request.GET.get('city', '')
+    print('free location:', selected_country, selected_state, selected_city)
+
     try:
-        free_ad = PostFreeAd.objects.filter(expiration_date__gt=current_datetime).order_by("?")
-        serializer = PostFreeAdSerializer(free_ad, many=True)
+        free_ads = PostFreeAd.objects.filter(expiration_date__gt=current_datetime).order_by("?")
+
+        if selected_country:
+            free_ads = free_ads.filter(country=selected_country)
+
+        if selected_state:
+            free_ads = free_ads.filter(state_province=selected_state)
+
+        if selected_city:
+            free_ads = free_ads.filter(city=selected_city)
+
+        serializer = PostFreeAdSerializer(free_ads, many=True)
         return Response(serializer.data)
     except PostFreeAd.DoesNotExist:
         return Response({'detail': 'Free ad not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -713,10 +730,30 @@ def delete_paid_ad(request):
 @permission_classes([AllowAny])
 @parser_classes([MultiPartParser, FormParser])
 def get_all_paid_ad(request):
+
     current_datetime = datetime.now()
+
+    selected_country = request.GET.get('country', '')
+    selected_state = request.GET.get('state', '')
+    selected_city = request.GET.get('city', '')
+
+    print('paid location:', selected_country, selected_state, selected_city)
+
     try:
-        paid_ad = PostPaidAd.objects.filter(expiration_date__gt=current_datetime).order_by("?")
-        serializer = PostPaidAdSerializer(paid_ad, many=True)
+        paid_ads = PostPaidAd.objects.filter(expiration_date__gt=current_datetime).order_by("?")
+        # paid_ads = None
+
+        if selected_country:
+            paid_ads = paid_ads.filter(country=selected_country)
+        elif selected_state:
+            paid_ads = paid_ads.filter(state_province=selected_state)
+        elif selected_city:
+            paid_ads = paid_ads.filter(city=selected_city)
+        # else:
+            # paid_ads = PostPaidAd.objects.filter(expiration_date__gt=current_datetime).order_by("?")
+            # return Response({'detail': 'Promoted ads not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = PostPaidAdSerializer(paid_ads, many=True)
         return Response(serializer.data)
     except PostPaidAd.DoesNotExist:
         return Response({'detail': 'Paid ad not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -924,6 +961,46 @@ def get_seller_detail(request, seller_username):
         return Response({'detail': 'Seller detail not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
+# @api_view(['GET'])
+# @permission_classes([AllowAny])
+# def search_ads(request, search_term):
+
+#     try:
+#         search_term = search_term.strip()
+#         current_datetime = datetime.now()
+
+#         free_ads = PostFreeAd.objects.filter(
+#             Q(ad_name__icontains=search_term) |
+#             Q(description__icontains=search_term) |
+#             Q(brand__icontains=search_term),
+#             expiration_date__gt=current_datetime
+#         )
+
+#         paid_ads = PostPaidAd.objects.filter(
+#             Q(ad_name__icontains=search_term) |
+#             Q(description__icontains=search_term) |
+#             Q(brand__icontains=search_term),
+#             expiration_date__gt=current_datetime
+#         )
+
+#         free_ads_serializer = PostFreeAdSerializer(free_ads, many=True)
+#         paid_ads_serializer = PostPaidAdSerializer(paid_ads, many=True)
+
+#         if not free_ads.exists() and not paid_ads.exists():
+#             raise PostFreeAd.DoesNotExist
+#         return Response({
+#             'free_ads': free_ads_serializer.data,
+#             'paid_ads': paid_ads_serializer.data,
+#         }, status=status.HTTP_200_OK)
+    
+#     except PostFreeAd.DoesNotExist:
+#         return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
+#     except PostPaidAd.DoesNotExist:
+#         return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
+#     except Exception as e:
+#         return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def search_ads(request, search_term):
@@ -931,6 +1008,10 @@ def search_ads(request, search_term):
     try:
         search_term = search_term.strip()
         current_datetime = datetime.now()
+
+        selected_country = request.GET.get('country', '')
+        selected_state = request.GET.get('state', '')
+        selected_city = request.GET.get('city', '')
 
         free_ads = PostFreeAd.objects.filter(
             Q(ad_name__icontains=search_term) |
@@ -946,22 +1027,36 @@ def search_ads(request, search_term):
             expiration_date__gt=current_datetime
         )
 
+        if selected_country:
+            free_ads = free_ads.filter(country=selected_country)
+            paid_ads = paid_ads.filter(country=selected_country)
+
+        if selected_state:
+            free_ads = free_ads.filter(state_province=selected_state)
+            paid_ads = paid_ads.filter(state_province=selected_state)
+
+        if selected_city:
+            free_ads = free_ads.filter(city=selected_city)
+            paid_ads = paid_ads.filter(city=selected_city)
+
         free_ads_serializer = PostFreeAdSerializer(free_ads, many=True)
         paid_ads_serializer = PostPaidAdSerializer(paid_ads, many=True)
 
         if not free_ads.exists() and not paid_ads.exists():
             raise PostFreeAd.DoesNotExist
+
         return Response({
             'free_ads': free_ads_serializer.data,
             'paid_ads': paid_ads_serializer.data,
         }, status=status.HTTP_200_OK)
-    
+
     except PostFreeAd.DoesNotExist:
         return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
     except PostPaidAd.DoesNotExist:
         return Response({'detail': 'Ad not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 # @api_view(['GET'])
