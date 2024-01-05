@@ -1003,7 +1003,14 @@ def get_seller_detail(request, seller_username):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def search_ads(request, search_term):
+def search_ads(request):
+
+    search_term = request.GET.get('search_term', '')
+    selected_country = request.GET.get('country', '')
+    selected_state = request.GET.get('state', '')
+    selected_city = request.GET.get('city', '')
+
+    print('search_term:', search_term, 'location:', selected_country, selected_state, selected_city)
 
     try:
         search_term = search_term.strip()
