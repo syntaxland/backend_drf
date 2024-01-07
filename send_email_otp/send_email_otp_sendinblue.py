@@ -50,7 +50,7 @@ def send_email_otp(request):
                     <p>This OTP is valid for 30 minutes.</p>
                     <p>If you didn't request this verification email, please ignore it.</p>
                     <p>Best regards,</p>
-                    <p>Sellangle Inc.</p>
+                    <p>Mcdofshop Inc.</p>
                 </body>
                 </html>
             """ 
