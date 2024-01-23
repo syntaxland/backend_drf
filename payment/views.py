@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.http import JsonResponse
 from django.http import Http404
-from django.db.models import Sum
+from django.db.models import Sum 
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -52,6 +52,7 @@ class PaymentDetailsView(APIView):
 def create_payment(request):
     user = request.user
     data = request.data
+    # print('data:', data)
     try:
         amount = int(request.data.get('amount'))
         email = request.data.get('email')
@@ -181,7 +182,7 @@ def create_payment(request):
         serializer = PaymentSerializer(payment)
         return Response({'payment': serializer.data,}, status=status.HTTP_201_CREATED)
     except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST) 
 
 
 @api_view(['GET'])
