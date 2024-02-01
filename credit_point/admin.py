@@ -34,23 +34,23 @@ class AuthorAdmin(admin.ModelAdmin):
                       )
     
 
-@admin.register(models.BuyCreditPoint)
-class AuthorAdmin(admin.ModelAdmin):
-    list_display = ('created_at', 
-                    'user', 
-                    'amount',
-                     'cps_amount', 
-                     'cps_purchase_id', 
-                     'is_success', 
-                     )
+# @admin.register(models.BuyCreditPoint)
+# class AuthorAdmin(admin.ModelAdmin):
+#     list_display = ('created_at', 
+#                     'user', 
+#                     'amount',
+#                      'cps_amount', 
+#                      'cps_purchase_id', 
+#                      'is_success', 
+#                      )
 
 
-@admin.register(models.SellCreditPoint)
-class AuthorAdmin(admin.ModelAdmin):
-    list_display = ('created_at',
-                     'seller', 
-                     'buyer', 
-                    'amount',                  
-                    'cps_sell_id', 
-                    'is_success', 
-                      )
+# @admin.register(models.SellCreditPoint)
+# class AuthorAdmin(admin.ModelAdmin):
+#     list_display = ('created_at',
+#                      'seller', 
+#                      'buyer', 
+#                     'amount',                  
+#                     'cps_sell_id', 
+#                     'is_success', 
+#                       )

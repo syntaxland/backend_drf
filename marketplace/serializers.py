@@ -63,6 +63,8 @@ class PaysofterApiKeySerializer(serializers.ModelSerializer):
 
 class MessageSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='user.first_name', read_only=True)
+    # first_name = serializers.CharField(source='free_ad.first_name', read_only=True)
+    # first_name = serializers.CharField(source='paid_ad.first_name', read_only=True)
     class Meta:
         model = Message
         fields = '__all__'
