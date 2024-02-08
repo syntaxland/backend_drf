@@ -45,7 +45,7 @@ def apply_promo_code(request):
         if not promo.is_valid():
             return Response({'detail': 'Promo code has expired.'}, status=status.HTTP_400_BAD_REQUEST)
     except PromoCode.DoesNotExist:
-        return Response({'detail': 'Invalid promo code.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail': 'Invalid promo code.'}, status=status.HTTP_400_BAD_REQUEST) 
 
     try:
         order_items_with_promo = OrderItem.objects.filter(product__promo_code__promo_code=promo_code, order__user=request.user, order__order_id=order_id)
@@ -66,7 +66,7 @@ def apply_promo_code(request):
             promo_discount += discount_amount
 
     promo_discount = promo_discount.quantize(Decimal('0.00'), rounding=ROUND_DOWN)
-    print('apply_promo_code promo_discount:', promo_discount, 'discount_percentage:', discount_percentage)
+    print('promo_discount:', promo_discount, 'discount_percentage:', discount_percentage)
 
     # Return the promo discount
     return Response({'promoDiscount': promo_discount, 'discountPercentage': discount_percentage}, status=status.HTTP_200_OK)
