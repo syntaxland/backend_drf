@@ -12,8 +12,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from rest_framework import status, generics, filters
 from rest_framework.views import APIView
-
-# from django.core import serializers
+ 
+# from django.core import serializers 
 from decimal import Decimal
 from django.db.models import Avg
 from django.core.exceptions import ObjectDoesNotExist
@@ -460,7 +460,7 @@ def getProducts(request):
 @api_view(['GET'])
 def getProduct(request, pk):
     product = Product.objects.get(_id=pk)
-    serializer = ProductSerializer(product, many=False)
+    serializer = ProductSerializer(product, many=False)   
     return Response(serializer.data)
  
 
@@ -480,8 +480,10 @@ class ProductDetailView(generics.RetrieveAPIView):
                 return Response([])
         else:
             product = get_object_or_404(self.get_queryset(), _id=pk)
+            print('pk:',pk)
             serializer = self.get_serializer(product)
             return Response(serializer.data) 
+
 
 class ProductSearchView(generics.ListAPIView):
     queryset = Product.objects.all()

@@ -7,7 +7,7 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app', '0007_auto_20231118_1352'),
+        # ('app', '0007_auto_20231118_1352'),
         ('user_profile', '0003_auto_20231124_1511'),
     ]
 

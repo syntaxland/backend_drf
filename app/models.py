@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model() 
 
-class Product(models.Model):
+class Product(models.Model): 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=200, null=True, blank=True)
     image = models.ImageField(upload_to='./images/products', null=True, blank=True)

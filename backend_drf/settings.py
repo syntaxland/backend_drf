@@ -63,7 +63,7 @@ INSTALLED_APPS = [
     # 'django.contrib.gis',
 
     # Myapps 
-    'app', 
+    'app',  
     'payment',
     'user_profile', 
     'send_email_otp',
@@ -359,7 +359,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #     "http://127.0.0.1:8000",
 # ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = True 
 
 # setting up s3 storages for media and static  
 # from storages.backends.s3boto3 import S3Boto3Storage
@@ -409,7 +409,7 @@ PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')
 PAYSTACK_PAYMENT_URL = os.getenv('PAYSTACK_PAYMENT_URL')
 CALLBACK_URL = os.getenv('CALLBACK_URL')
 
-PAYSOFTER_PUBLIC_KEY = os.getenv('PAYSOFTER_PUBLIC_KEY')
+PAYSOFTER_PUBLIC_KEY = os.getenv('PAYSOFTER_PUBLIC_KEY') 
 PAYSOFTER_PAYMENT_URL = os.getenv('PAYSOFTER_PAYMENT_URL')
 
 MCDOFSHOP_URL = os.getenv('MCDOFSHOP_URL')

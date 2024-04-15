@@ -8,10 +8,10 @@ urlpatterns = [
     path('products/<str:pk>/', views.ProductDetailView.as_view(), name='getProduct'),
     path('user/profile/', views.getUserProfiles, name="getUserProfiles"), 
     # path('products/<str:pk>/', views.getProduct, name='getProduct'),
-    path('users/', views.getUsers, name="getUsers"),
+    path('users/', views.getUsers, name="getUsers"), 
     
     # path('products/search/', views.ProductSearchView.as_view(), name='product-search'),
-    path('products/search/<str:keyword>', views.ProductSearchView.as_view(), name='product-search'),
+    path('products/search/<str:keyword>', views.ProductSearchView.as_view(), name='product-search'), 
 
     # path('products/search/', views.ProductSearchView.as_view(), name='product-search'),
     path('create-order/', views.create_order, name='create_order'), 
