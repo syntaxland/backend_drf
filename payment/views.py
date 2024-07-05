@@ -19,8 +19,8 @@ from rest_framework.decorators import api_view, permission_classes
 from app.models import Product, Order
 from payment.models import Payment
 from .serializers import PaymentSerializer, UserPaymentSerializer
-from credit_point.models import CreditPoint, CreditPointPayment, CreditPointEarning
-from promo.models import Referral, ReferralBonus
+# from credit_point.models import CreditPoint, CreditPointPayment, CreditPointEarning
+# from promo.models import Referral, ReferralBonus
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -98,80 +98,80 @@ def create_payment(request):
             print('Payment details:', payment)
 
             # Calculate the credit points earned (1% and/or 0.5% of payment final_items_amount)
-            credit_points_earned = Decimal(str(final_items_amount)) * Decimal('0.01')
-            referral_credit_points_bonus = Decimal(str(final_items_amount)) * Decimal('0.005')
-            print('Credit_points_earned:', credit_points_earned,
-                  'Referral_credit_points_bonus:', referral_credit_points_bonus, 
-                  'Final items amount:', final_items_amount,
-                  'Total amount:', amount,
-                  'Final total amount after promo:', final_total_amount,
-                )
-            try:
+            # credit_points_earned = Decimal(str(final_items_amount)) * Decimal('0.01')
+            # referral_credit_points_bonus = Decimal(str(final_items_amount)) * Decimal('0.005')
+            # print('Credit_points_earned:', credit_points_earned,
+            #       'Referral_credit_points_bonus:', referral_credit_points_bonus, 
+            #       'Final items amount:', final_items_amount,
+            #       'Total amount:', amount,
+            #       'Final total amount after promo:', final_total_amount,
+            #     )
+            # try:
                 # Get or create the user's credit point balance
-                credit_point, created = CreditPoint.objects.get_or_create( 
-                    user=request.user,
-                    )
+                # credit_point, created = CreditPoint.objects.get_or_create( 
+                #     user=request.user,
+                #     )
                 
-                credit_point.balance += credit_points_earned
-                credit_point.save()
-                print('Credit points added.')
+                # credit_point.balance += credit_points_earned
+                # credit_point.save()
+                # print('Credit points added.')
 
-                try:
-                    CreditPointEarning.objects.create(
-                    user=request.user,
-                    order_payment=payment,
-                    credit_points_earned=credit_points_earned, 
-                    )
-                except CreditPointEarning.DoesNotExist:
-                    pass
+                # try:
+                #     CreditPointEarning.objects.create(
+                #     user=request.user,
+                #     order_payment=payment,
+                #     credit_points_earned=credit_points_earned, 
+                #     )
+                # except CreditPointEarning.DoesNotExist:
+                #     pass
 
-                print('Getting referrals...')
-                referrals = Referral.objects.filter(referred_users=user)
-                if not referrals:
-                        return Response({'detail': 'Referrer not found.'})
+                # print('Getting referrals...')
+                # referrals = Referral.objects.filter(referred_users=user)
+                # if not referrals:
+                #         return Response({'detail': 'Referrer not found.'})
                 
-                for referral in referrals:
-                    print('Getting referrer...')
-                    referrer = referral.referrer
-                    print('referrer:', referrer)
+                # for referral in referrals:
+                #     print('Getting referrer...')
+                #     referrer = referral.referrer
+                #     print('referrer:', referrer)
 
-                    print('\nGetting ReferralBonus...')
+                #     print('\nGetting ReferralBonus...')
 
-                    try:
-                        # Check if a ReferralBonus for the same referrer already exists
-                        existing_referral_bonus = ReferralBonus.objects.filter(referrer=referrer).first()
+                #     try:
+                #         # Check if a ReferralBonus for the same referrer already exists
+                #         existing_referral_bonus = ReferralBonus.objects.filter(referrer=referrer).first()
 
-                        if existing_referral_bonus:
-                            # If it exists, update the existing bonus
-                            existing_referral_bonus.referral_credit_points_bonus += referral_credit_points_bonus
-                            existing_referral_bonus.save()
-                        else:
-                            # If it doesn't exist, create a new one
-                            ReferralBonus.objects.create(
-                                referrer=referrer, 
-                                referral_credit_points_bonus=referral_credit_points_bonus,
-                            )
-                        
-                        # Update the referrer's credit point balance for each referral
-                        referrer_credit_point, created = CreditPoint.objects.get_or_create(user=referrer)
-                        referrer_credit_point.balance += referral_credit_points_bonus
-                        referrer_credit_point.save()
-                    except ReferralBonus.DoesNotExist:
-                        pass
+                #         if existing_referral_bonus:
+                #             # If it exists, update the existing bonus
+                #             existing_referral_bonus.referral_credit_points_bonus += referral_credit_points_bonus
+                #             existing_referral_bonus.save()
+                #         else:
+                #             # If it doesn't exist, create a new one
+                #             ReferralBonus.objects.create(
+                #                 referrer=referrer, 
+                #                 referral_credit_points_bonus=referral_credit_points_bonus,
+                #             )
+                         
+                #         # Update the referrer's credit point balance for each referral
+                #         referrer_credit_point, created = CreditPoint.objects.get_or_create(user=referrer)
+                #         referrer_credit_point.balance += referral_credit_points_bonus
+                #         referrer_credit_point.save()
+                #     except ReferralBonus.DoesNotExist:
+                #         pass
              
-                print('Getting CreditPointPayment...')
-                try:
-                    CreditPointPayment.objects.create(
-                        order_payment=payment,
-                        referrer=referrer, 
-                        credit_points_earned=credit_points_earned,
-                        referral_credit_points_bonus=referral_credit_points_bonus,
-                    )
-                except CreditPointPayment.DoesNotExist:
-                    return Response({'detail': 'Credit Point Payments not found.'}, status=status.HTTP_404_NOT_FOUND)
+                # print('Getting CreditPointPayment...')
+                # try:
+                #     CreditPointPayment.objects.create(
+                #         order_payment=payment,
+                #         referrer=referrer, 
+                #         credit_points_earned=credit_points_earned,
+                #         referral_credit_points_bonus=referral_credit_points_bonus,
+                #     )
+                # except CreditPointPayment.DoesNotExist:
+                #     return Response({'detail': 'Credit Point Payments not found.'}, status=status.HTTP_404_NOT_FOUND)
                 
-            except CreditPoint.DoesNotExist:
-                pass
+            # except CreditPoint.DoesNotExist:
+            #     pass
             
             # Return a success response
             return Response({'detail': 'Payment successful'}, status=status.HTTP_200_OK)

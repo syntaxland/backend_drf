@@ -68,19 +68,14 @@ INSTALLED_APPS = [
     'user_profile', 
     'send_email_otp',
     'send_reset_password_email',
-    'credit_point',  
     'send_email_message',
     'send_message_inbox', 
     'recommender',
     'live_chat',
     'promo',
-    'sellers',
     'support',
     'feedback',
-    'marketplace',
-    # 'ecommerce', 
-    # 'products',
-
+    
     # Third-party apps
     'rest_framework', 
     'rest_framework_simplejwt',
