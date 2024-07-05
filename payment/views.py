@@ -33,7 +33,7 @@ class PaymentDetailsView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
         paystack_public_key = settings.PAYSTACK_PUBLIC_KEY
-        paysofter_public_key = settings.PAYSOFTER_PUBLIC_KEY
+        paysofter_public_key = settings.PAYSOFTER_PUBLIC_KEY 
 
         # email = request.user.email
         reference = generate_payment_reference()
